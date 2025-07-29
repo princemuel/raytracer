@@ -1,6 +1,14 @@
 [package]
-name = "raytracer"
-version = "0.1.0"
-edition = "2024"
+  name = "raytracer"
+  version = "0.1.0"
+  edition = "2024"
 
 [dependencies]
+
+[dev-dependencies]
+  cucumber = "0.20"
+  futures = "0.3"
+
+[[test]]
+  name = "example" # this should be the same as the filename of your test target
+  harness = false  # allows Cucumber to print output instead of libtest
