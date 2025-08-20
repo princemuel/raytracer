@@ -21,7 +21,7 @@
   "rust-analyzer.imports.prefix": "crate",
   "rust-analyzer.imports.merge.glob": true,
   "rust-analyzer.imports.prefixExternPrelude": false,
-  "rust-analyzer.imports.preferNoStd": true,
+  "rust-analyzer.imports.preferNoStd": false,
   "rust-analyzer.imports.preferPrelude": true,
   // Inlay Hints
   "rust-analyzer.inlayHints.typeHints.enable": false,
