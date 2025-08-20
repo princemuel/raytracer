@@ -1,2 +1,2 @@
 pub mod mathf;
-pub mod tuple;
+pub mod primitives;
