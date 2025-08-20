@@ -6,9 +6,9 @@
 [dependencies]
 
 [dev-dependencies]
-  cucumber = "0.20"
-  futures = "0.3"
+  cucumber = "0.21"
+  tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
 
 [[test]]
-  name = "example" # this should be the same as the filename of your test target
-  harness = false  # allows Cucumber to print output instead of libtest
+  name = "cucumber" # this should be the same as the filename of your test target
+  harness = false  # Allows Cucumber to print output instead of libtest

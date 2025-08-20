@@ -17,9 +17,13 @@ use_field_init_shorthand = true
 use_small_heuristics = "Default"
 use_try_shorthand = true
 # -----------------------------------------------
+# Basic Settings
+# -----------------------------------------------
+unstable_features = true
+# -----------------------------------------------
 # Unstable Features
 # -----------------------------------------------
-# blank_lines_lower_bound      = 1
+blank_lines_lower_bound = 0
 condense_wildcard_suffixes = true
 enum_discrim_align_threshold = 20
 fn_single_line = true
@@ -41,6 +45,5 @@ struct_field_align_threshold = 20
 struct_lit_single_line = true
 trailing_comma = "Vertical"
 trailing_semicolon = true
-unstable_features = true
 where_single_line = true
 wrap_comments = true
