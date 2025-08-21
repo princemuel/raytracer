@@ -1,8 +1,9 @@
-mod world;
+mod steps;
+mod support;
 
 use cucumber::World as _;
 
-use crate::world::TestWorld;
+use crate::support::world::TestWorld;
 
 #[tokio::main]
 async fn main() {

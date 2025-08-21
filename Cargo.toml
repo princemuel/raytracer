@@ -4,9 +4,11 @@
   edition = "2024"
 
 [dependencies]
+  float-cmp  = "0.10"
 
 [dev-dependencies]
   cucumber = "0.21"
+  derive_more = { version = "2", features = ["full"] }
   tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
 
 [[test]]
