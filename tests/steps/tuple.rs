@@ -1,110 +1,107 @@
 use cucumber::{given, then};
-use raytracer::math::approx::ApproxEq as _;
-use raytracer::primitives::{Point, Tuple, Vector};
+use raytracer::primitives::{point, tuple, vector};
 
-use crate::support::helpers::Float64;
+use crate::support::helpers::tuple::TupleVariant;
+// use crate::support::helpers::{Float64, get_tuple};
 use crate::support::world::TestWorld;
 
-#[given(
-    regex = r"^a ← tuple\((?P<x>[-0-9.]+), (?P<y>[-0-9.]+), (?P<z>[-0-9.]+), (?P<w>[-0-9.]+)\)$"
-)]
-async fn given_a_tuple(world: &mut TestWorld, x: Float64, y: Float64, z: Float64, w: Float64) {
-    let x = *x;
-    let y = *y;
-    let z = *z;
-    let w = *w;
+// ------------------------------------------------------------------------------
+#[given(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← tuple\(([^,]+), ([^,]+), ([^,]+), ([^)]+)\)$")]
+async fn given_a_tuple(world: &mut TestWorld, name: String, x: f32, y: f32, z: f32, w: f32) {
+    let t = tuple(x, y, z, w);
+    world.insert(&name, TupleVariant::Generic(t));
+}
 
-    if w.approx_eq_low_precision(1.0) {
-        world.insert("a", Point::new(x, y, z));
-    } else if w.approx_eq_low_precision(0.0) {
-        world.insert("a", Vector::new(x, y, z));
-    } else {
-        panic!("unsupported tuple w value: {}", w);
-    }
+#[given(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← point\(([^,]+), ([^,]+), ([^)]+)\)$")]
+fn given_a_point(world: &mut TestWorld, name: String, x: f32, y: f32, z: f32) {
+    let p = point(x, y, z);
+    world.insert(&name, TupleVariant::Point(p));
 }
-#[then(expr = "a.x = {float}")]
-async fn then_a_x(world: &mut TestWorld, value: f64) {
-    let expected = value;
-    let actual = match (world.get::<Point>("a"), world.get::<Vector>("a")) {
-        (Some(p), _) => p.x(),
-        (_, Some(v)) => v.x(),
-        _ => panic!("no value 'a' found in world"),
-    };
-    assert!(
-        actual.approx_eq_low_precision(expected),
-        "a.y = {actual} does not match expected {expected}",
-    );
+
+#[given(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← vector\(([^,]+), ([^,]+), ([^)]+)\)$")]
+fn given_a_vector(world: &mut TestWorld, name: String, x: f32, y: f32, z: f32) {
+    let v = vector(x, y, z);
+    world.insert(&name, TupleVariant::Vector(v));
 }
-#[then(expr = "a.y = {float}")]
-async fn then_a_y(world: &mut TestWorld, value: f64) {
-    let expected = value;
-    let actual = match (world.get::<Point>("a"), world.get::<Vector>("a")) {
-        (Some(p), _) => p.y(),
-        (_, Some(v)) => v.y(),
-        _ => panic!("no value 'a' found in world"),
-    };
+
+// ------------------------------------------------------------------------------
+#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.x = ([^$]+)$")]
+fn then_x_equals(world: &mut TestWorld, name: String, expected: f32) {
+    let t = world.get::<TupleVariant>(&name).unwrap();
     assert!(
-        actual.approx_eq_low_precision(expected),
-        "a.x= {actual} does not match expected {expected}",
+        (t.x() - expected).abs() < f32::EPSILON,
+        "Expected x={}, got x={}",
+        expected,
+        t.x()
     );
 }
 
-#[then(expr = "a.z = {float}")]
-async fn then_a_z(world: &mut TestWorld, value: f64) {
-    let expected = value;
-    let actual = match (world.get::<Point>("a"), world.get::<Vector>("a")) {
-        (Some(p), _) => p.z(),
-        (_, Some(v)) => v.z(),
-        _ => panic!("no value 'a' found in world"),
-    };
+#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.y = ([^$]+)$")]
+fn then_y_equals(world: &mut TestWorld, name: String, expected: f32) {
+    let t = world.get::<TupleVariant>(&name).unwrap();
     assert!(
-        actual.approx_eq_low_precision(expected),
-        "a.z= {actual} does not match expected {expected}",
+        (t.y() - expected).abs() < f32::EPSILON,
+        "Expected y={}, got y={}",
+        expected,
+        t.y()
     );
 }
 
-#[then(expr = "a.w = {float}")]
-async fn then_a_w(world: &mut TestWorld, value: f64) {
-    let expected = value;
-    let actual = match (world.get::<Point>("a"), world.get::<Vector>("a")) {
-        (Some(p), _) => p.w(),
-        (_, Some(v)) => v.w(),
-        _ => panic!("no value 'a' found in world"),
-    };
+#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.z = ([^$]+)$")]
+fn then_z_equals(world: &mut TestWorld, name: String, expected: f32) {
+    let t = world.get::<TupleVariant>(&name).unwrap();
     assert!(
-        actual.approx_eq_low_precision(expected),
-        "a.w= {actual} does not match expected {expected}",
+        (t.z() - expected).abs() < f32::EPSILON,
+        "Expected z={}, got z={}",
+        expected,
+        t.z()
     );
 }
 
-#[then(expr = "a is a point")]
-async fn then_a_is_point(world: &mut TestWorld) {
+#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.w = ([^$]+)$")]
+fn then_w_equals(world: &mut TestWorld, name: String, expected: f32) {
+    let t = world.get::<TupleVariant>(&name).unwrap();
     assert!(
-        world.get::<Point>("a").is_some(),
-        "expected 'a' to be a Point"
+        (t.w() - expected).abs() < f32::EPSILON,
+        "Expected w={}, got w={}",
+        expected,
+        t.w()
     );
 }
 
-#[then(expr = "a is not a vector")]
-async fn then_a_is_not_vector(world: &mut TestWorld) {
-    assert!(
-        world.get::<Vector>("a").is_none(),
-        "expected 'a' to not be a Vector"
-    );
+// ------------------------------------------------------------------------------
+#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is a point$")]
+fn then_is_point(world: &mut TestWorld, name: String) {
+    let t = world.get::<TupleVariant>(&name).unwrap();
+    assert!(t.is_point(), "Expected {} to be a point", name);
 }
 
-#[then(expr = "a is not a point")]
-async fn then_a_is_not_point(world: &mut TestWorld) {
-    assert!(
-        world.get::<Point>("a").is_none(),
-        "expected 'a' to not be a Point"
-    );
+#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is not a point$")]
+fn then_is_not_point(world: &mut TestWorld, name: String) {
+    let t = world.get::<TupleVariant>(&name).unwrap();
+    assert!(!t.is_point(), "Expected {} to not be a point", name);
 }
 
-#[then(expr = "a is a vector")]
-async fn then_a_is_vector(world: &mut TestWorld) {
+#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is a vector$")]
+fn then_is_vector(world: &mut TestWorld, name: String) {
+    let t = world.get::<TupleVariant>(&name).unwrap();
+    assert!(t.is_vector(), "Expected {} to be a vector", name);
+}
+
+#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is not a vector$")]
+fn then_is_not_vector(world: &mut TestWorld, name: String) {
+    let t = world.get::<TupleVariant>(&name).unwrap();
+    assert!(!t.is_vector(), "Expected {} to not be a vector", name);
+}
+
+#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([^,]+), ([^,]+), ([^,]+), ([^)]+)\)$")]
+fn then_equals_tuple(world: &mut TestWorld, name: String, x: f32, y: f32, z: f32, w: f32) {
+    let t = world.get::<TupleVariant>(&name).unwrap();
+    let expected = tuple(x, y, z, w);
     assert!(
-        world.get::<Vector>("a").is_some(),
-        "expected 'a' to be a Vector"
+        t.as_generic().approx_eq(&expected, f32::EPSILON),
+        "Expected {:?}, got {:?}",
+        expected,
+        t.as_generic()
     );
 }
