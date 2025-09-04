@@ -12,7 +12,7 @@ A **ray tracer project implemented in Rust**. It is inspired by [_The Ray Tracer
 - [Overview](#overview)
 - [What is Ray Tracing?](#what-is-ray-tracing)
 - [Features](#features)
-- [Run](#run)
+- [How to run this project](#how-to-run-this-project)
 - [Screenshots](#screenshots)
 - [Roadmap](#roadmap)
 - [Learning Notes](#learning-notes)
@@ -37,7 +37,7 @@ It’s powerful for accuracy but computationally expensive.
 
 - [ ] Chapter 01: fjfjjfjf
 
-## Run
+## How to run this project
 
 ```sh
 cargo run --release
