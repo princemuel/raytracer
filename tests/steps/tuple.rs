@@ -61,6 +61,7 @@ fn then_is_not_vector(world: &mut TestWorld, name: String) {
     assert!(!t.is_vector(), "Expected {} to not be a vector", name);
 }
 
+// ------------------------------------------------------------------------------
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([^,]+), ([^,]+), ([^,]+), ([^)]+)\)$")]
 fn then_variable_equals_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64, w: f64) {
     let t = world.get::<Tuple>(&name).unwrap();
