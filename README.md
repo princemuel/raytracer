@@ -7,8 +7,6 @@ A **ray tracer project implemented in Rust**. It is inspired by [_The Ray Tracer
 [ci-badge]: https://github.com/princemuel/raytracer/actions/workflows/rust-ci.yml/badge.svg
 [rtc-challenge]: http://raytracerchallenge.com/
 
----
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -21,16 +19,12 @@ A **ray tracer project implemented in Rust**. It is inspired by [_The Ray Tracer
 - [Resources](#resources)
 - [Author](#author)
 
----
-
 ## Overview
 
 This project serves two purposes:
 
 - **Showcase**: demonstrate progress in building a ray tracer step by step.
 - **Learning log**: capture insights about Rust, graphics programming, and math along the way.
-
----
 
 ## What is Ray Tracing?
 
@@ -39,13 +33,9 @@ It’s powerful for accuracy but computationally expensive.
 
 🔗 [Ray Tracing on Wikipedia](<https://en.wikipedia.org/wiki/Ray_tracing_(graphics)>)
 
----
-
 ## Features
 
 - [ ] Chapter 01: fjfjjfjf
-
----
 
 ## Run
 
@@ -53,13 +43,9 @@ It’s powerful for accuracy but computationally expensive.
 cargo run --release
 ```
 
----
-
 ## Screenshots
 
 <!-- _(Example renders go here — from first spheres to more complex scenes. Show progress, not just final results.)_ -->
-
----
 
 ## Roadmap
 
@@ -76,8 +62,6 @@ cargo run --release
 - [ ] Build a web app frontend to generate 3D images interactively
 - [ ] Publish online demo with examples and benchmarks
 
----
-
 ## Learning Notes
 
 Things I’ve learned while working on this project:
@@ -86,8 +70,6 @@ Things I’ve learned while working on this project:
 - Writing **matrix math** from scratch clarified transformations and coordinate systems.
 - Debugging intersections required intermediate visualizations (like surface normals).
 - Translating pseudocode into idiomatic Rust often meant rethinking data structures.
-
----
 
 ## Resources
 
@@ -98,12 +80,8 @@ Things I’ve learned while working on this project:
 - [Cucumber Rust Repo](https://github.com/cucumber-rs/cucumber)
 - [Cucumber Rust Docs](https://cucumber-rs.github.io/cucumber/main/)
 
----
-
 ## Author
 
 - GitHub — [princemuel](https://github.com/princemuel)
 - Twitter — [@iamprincemuel](https://x.com/iamprincemuel)
 <!-- - Website — [princemuel.com](https://princemuel.com) -->
-
----

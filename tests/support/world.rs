@@ -19,7 +19,7 @@ impl TestWorld {
     }
 
     /// Remove and return a value of type T previously inserted under `key`.
-    pub fn take<T: 'static + Send + Sync>(&mut self, key: &str) -> Option<T> {
+    pub fn _take<T: 'static + Send + Sync>(&mut self, key: &str) -> Option<T> {
         self.store
             .remove(key)
             .and_then(|b| b.downcast::<T>().ok().map(|boxed| *boxed))
