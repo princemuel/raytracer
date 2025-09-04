@@ -1,1 +1,1 @@
-# Ray Trace Challenge
+# Ray Tracer Challenge

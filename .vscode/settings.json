@@ -1,6 +1,6 @@
 {
   "editor.wordWrap": "bounded",
-  "editor.wordWrapColumn": 96,
+  "editor.wordWrapColumn": 120,
   "editor.formatOnSave": true,
   "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
   "files.autoSave": "off",
@@ -21,7 +21,7 @@
   "rust-analyzer.imports.prefix": "crate",
   "rust-analyzer.imports.merge.glob": true,
   "rust-analyzer.imports.prefixExternPrelude": false,
-  "rust-analyzer.imports.preferNoStd": false,
+  "rust-analyzer.imports.preferNoStd": true,
   "rust-analyzer.imports.preferPrelude": true,
   // Inlay Hints
   "rust-analyzer.inlayHints.typeHints.enable": false,

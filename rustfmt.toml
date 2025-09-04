@@ -3,7 +3,7 @@ style_edition = "2024"
 # Basic Settings
 # -----------------------------------------------
 hard_tabs = false
-max_width = 96
+max_width = 108
 newline_style = "Unix"
 tab_spaces = 4
 # -----------------------------------------------
@@ -45,5 +45,5 @@ struct_field_align_threshold = 20
 struct_lit_single_line = true
 trailing_comma = "Vertical"
 trailing_semicolon = true
-where_single_line = true
+# where_single_line = true
 wrap_comments = true

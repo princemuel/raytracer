@@ -10,7 +10,7 @@ insert_final_newline = true
 end_of_line = lf
 indent_style = space
 indent_size = 4
-max_line_length = 120
+max_line_length = 108
 trim_trailing_whitespace = true
 
 # Specific settings for some files
@@ -23,7 +23,7 @@ indent_size = 2
 # Specific settings for Markdown files
 [{*.md,*.mdx,*.mdoc}]
 indent_size = 2
-max_line_length = 96
+max_line_length = 108
 trim_trailing_whitespace = false
 
 # Makefiles always use tabs for indentation
