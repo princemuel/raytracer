@@ -103,7 +103,7 @@ Things I’ve learned while working on this project:
 ## Author
 
 - GitHub — [princemuel](https://github.com/princemuel)
-- Twitter — [@iamprincemuel](https://x.com/iamprincemuel) princemuel
-- Website — princemuel
+- Twitter — [@iamprincemuel](https://x.com/iamprincemuel)
+<!-- - Website — [princemuel.com](https://princemuel.com) -->
 
 ---
