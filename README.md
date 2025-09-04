@@ -1,9 +1,11 @@
 # Ray Tracer Challenge
 
-![CI Status](https://github.com/agentbellnorm/ray-tracer-challenge/actions/workflows/rust-ci.yml/badge.svg)
+![CI Status][ci-badge]
 
-A **ray tracer written in Rust**, inspired by [_The Ray Tracer Challenge_](http://raytracerchallenge.com/) by Jamis Buck.  
-The book provides pseudocode and test cases; the implementation is left to the reader.
+A **ray tracer project implemented in Rust**. It is inspired by [_The Ray Tracer Challenge_][rtc-challenge] by Jamis Buck. The book provides pseudocode and test cases; the implementation is left to the reader.
+
+[ci-badge]: https://github.com/princemuel/raytracer/actions/workflows/rust-ci.yml/badge.svg
+[rtc-challenge]: http://raytracerchallenge.com/
 
 ---
 
@@ -41,10 +43,7 @@ It’s powerful for accuracy but computationally expensive.
 
 ## Features
 
-- ✅ Ray–sphere intersections
-- ✅ Simple shading & lighting
-- ✅ Render output to PPM/PNG
-- 🚧 Reflections, refractions, and more primitives
+- [ ] Chapter 01: fjfjjfjf
 
 ---
 
