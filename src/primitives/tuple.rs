@@ -111,6 +111,7 @@ impl Mul<f64> for Tuple {
 impl Div<f64> for Tuple {
     type Output = Self;
 
+    // diverges from the book i.e not dividing each tuple component by the scalar
     fn div(self, rhs: f64) -> Self::Output { self * (1.0 / rhs) }
 }
 

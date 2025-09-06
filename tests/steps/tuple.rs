@@ -43,22 +43,22 @@ fn then_w_equals(world: &mut TestWorld, name: String, expected: f64) {
 
 // ------------------------------------------------------------------------------
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is a point$")]
-fn then_is_point(world: &mut TestWorld, name: String) {
+fn then_is_a_point(world: &mut TestWorld, name: String) {
     let t = world.get::<Tuple>(&name).unwrap();
     assert!(t.is_point(), "Expected {} to be a point", name);
 }
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is not a point$")]
-fn then_is_not_point(world: &mut TestWorld, name: String) {
+fn then_is_not_a_point(world: &mut TestWorld, name: String) {
     let t = world.get::<Tuple>(&name).unwrap();
     assert!(!t.is_point(), "Expected {} to not be a point", name);
 }
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is a vector$")]
-fn then_is_vector(world: &mut TestWorld, name: String) {
+fn then_is_a_vector(world: &mut TestWorld, name: String) {
     let t = world.get::<Tuple>(&name).unwrap();
     assert!(t.is_vector(), "Expected {} to be a vector", name);
 }
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is not a vector$")]
-fn then_is_not_vector(world: &mut TestWorld, name: String) {
+fn then_is_not_a_vector(world: &mut TestWorld, name: String) {
     let t = world.get::<Tuple>(&name).unwrap();
     assert!(!t.is_vector(), "Expected {} to not be a vector", name);
 }
@@ -67,12 +67,13 @@ fn then_is_not_vector(world: &mut TestWorld, name: String) {
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([^)]+)\)$"
 )]
-fn then_variable_equals_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64, w: f64) {
+fn then_var_equals_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64, w: f64) {
     let t = world.get::<Tuple>(&name).unwrap();
     let expected = Tuple::new(x, y, z, w);
     assert!(t == &expected, "Expected {:?}, got {:?}", expected, t);
 }
 
+// ------------------------------------------------------------------------------
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \+ ([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([^)]+)\)$"
 )]
@@ -115,7 +116,7 @@ fn then_sub_equals_point(world: &mut TestWorld, a: String, b: String, x: f64, y:
 #[then(
     regex = r"^-([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([^)]+)\)$"
 )]
-fn then_negate_var_equals_tuple(world: &mut TestWorld, a: String, x: f64, y: f64, z: f64, w: f64) {
+fn then_neg_var_equals_tuple(world: &mut TestWorld, a: String, x: f64, y: f64, z: f64, w: f64) {
     let t = *(world.get::<Tuple>(&a).unwrap());
 
     let actual = -t;
@@ -147,7 +148,7 @@ fn then_var_times_value_equals_tuple(
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \/ ([-+]?\d*\.?\d+) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([^)]+)\)$"
 )]
-fn then_var_divide_value_equals_tuple(
+fn then_var_div_value_equals_tuple(
     world: &mut TestWorld,
     a: String,
     v: f64,
@@ -163,3 +164,5 @@ fn then_var_divide_value_equals_tuple(
 
     assert!(actual == expected, "Expected {:?}, got {:?}", expected, actual);
 }
+
+// ------------------------------------------------------------------------------
