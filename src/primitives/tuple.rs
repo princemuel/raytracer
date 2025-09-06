@@ -13,20 +13,6 @@ pub struct Tuple {
 impl Tuple {
     pub const fn new(x: f64, y: f64, z: f64, w: f64) -> Self { Self { x, y, z, w } }
 
-    pub fn magnitude(&self) -> f64 { todo!() }
-
-    pub fn normalize(&self) -> Self { todo!() }
-
-    pub fn dot(&self, _other: &Self) -> f64 { todo!() }
-
-    pub fn cross(&self, _other: &Self) -> Self { todo!() }
-
-    pub fn reflect(&self, _other: &Self) -> Self { todo!() }
-
-    pub const fn is_point(&self) -> bool { is_equal_float(self.w, 1.0) }
-
-    pub const fn is_vector(&self) -> bool { is_equal_float(self.w, 0.0) }
-
     pub const fn x(&self) -> f64 { self.x }
 
     pub const fn y(&self) -> f64 { self.y }
@@ -36,87 +22,41 @@ impl Tuple {
     pub const fn w(&self) -> f64 { self.w }
 }
 
-impl From<(i32, i32, i32)> for Tuple {
-    fn from((x, y, z): (i32, i32, i32)) -> Self { point(x as f64, y as f64, z as f64) }
-}
-
-impl PartialEq for Tuple {
-    fn eq(&self, other: &Self) -> bool {
-        is_equal_float(self.x, other.x)
-            && is_equal_float(self.y, other.y)
-            && is_equal_float(self.z, other.z)
-            && is_equal_float(self.w, other.w)
-    }
-}
-impl Eq for Tuple {}
-
-impl Add for Tuple {
-    type Output = Self;
-
-    fn add(self, other: Self) -> Self::Output {
-        Self::new(
-            self.x + other.x,
-            self.y + other.y,
-            self.z + other.z,
-            self.w + other.w,
-        )
-    }
-}
-
-impl Sub for Tuple {
-    type Output = Self;
-
-    fn sub(self, other: Self) -> Self::Output {
-        Self::new(
-            self.x - other.x,
-            self.y - other.y,
-            self.z - other.z,
-            self.w - other.w,
-        )
-    }
-}
-
-impl Sub for &Tuple {
-    type Output = Tuple;
-
-    fn sub(self, other: Self) -> Self::Output {
-        Tuple::new(
-            self.x - other.x,
-            self.y - other.y,
-            self.z - other.z,
-            self.w - other.w,
-        )
-    }
-}
-
-impl Neg for Tuple {
-    type Output = Self;
-
-    fn neg(self) -> Self::Output { Self::new(-self.x, -self.y, -self.z, -self.w) }
-}
-
-impl Mul<f64> for Tuple {
-    type Output = Self;
-
-    fn mul(self, rhs: f64) -> Self::Output {
-        Self::new(self.x * rhs, self.y * rhs, self.z * rhs, self.w * rhs)
-    }
-}
-
-impl Div<f64> for Tuple {
-    type Output = Self;
-
-    fn div(self, rhs: f64) -> Self::Output {
-        Self::new(self.x / rhs, self.y / rhs, self.z / rhs, self.w / rhs)
-    }
-}
-
 pub const fn point(x: f64, y: f64, z: f64) -> Tuple { Tuple { x, y, z, w: 1.0 } }
 
 pub const fn vector(x: f64, y: f64, z: f64) -> Tuple { Tuple { x, y, z, w: 0.0 } }
 
-pub struct Point<T>(T, T, T);
-pub struct Vector<T>(T, T, T);
+impl Tuple {
+    pub const fn is_point(&self) -> bool { is_equal_float(self.w, 1.0) }
+
+    pub const fn is_vector(&self) -> bool { is_equal_float(self.w, 0.0) }
+}
+
+impl Tuple {
+    pub fn magnitude(&self) -> f64 { todo!() }
+
+    pub fn normalize(&self) -> Self { todo!() }
+
+    pub fn dot(&self, _rhs: &Self) -> f64 { todo!() }
+
+    pub fn cross(&self, _rhs: &Self) -> Self { todo!() }
+
+    pub fn reflect(&self, _rhs: &Self) -> Self { todo!() }
+}
+
+impl PartialEq for Tuple {
+    fn eq(&self, rhs: &Self) -> bool {
+        is_equal_float(self.x, rhs.x)
+            && is_equal_float(self.y, rhs.y)
+            && is_equal_float(self.z, rhs.z)
+            && is_equal_float(self.w, rhs.w)
+    }
+}
+impl Eq for Tuple {}
+
+impl From<(i32, i32, i32)> for Tuple {
+    fn from((x, y, z): (i32, i32, i32)) -> Self { point(x as f64, y as f64, z as f64) }
+}
 
 impl<T> From<Point<T>> for Tuple
 where
@@ -131,6 +71,57 @@ where
 {
     fn from(Vector(x, y, z): Vector<T>) -> Self { vector(x.into(), y.into(), z.into()) }
 }
+
+impl Add for Tuple {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z, self.w + rhs.w)
+    }
+}
+
+impl Sub for Tuple {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z, self.w - rhs.w)
+    }
+}
+
+impl Neg for Tuple {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output { Self::new(-self.x, -self.y, -self.z, -self.w) }
+}
+
+impl Mul<Tuple> for f64 {
+    type Output = Tuple;
+
+    fn mul(self, rhs: Tuple) -> Self::Output {
+        Tuple::new(self * rhs.x, self * rhs.y, self * rhs.z, self * rhs.w)
+    }
+}
+
+impl Mul<f64> for Tuple {
+    type Output = Self;
+
+    fn mul(self, rhs: f64) -> Self::Output { rhs * self }
+}
+
+impl Div<f64> for Tuple {
+    type Output = Self;
+
+    fn div(self, rhs: f64) -> Self::Output { self * (1.0 / rhs) }
+}
+
+impl core::fmt::Display for Tuple {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "({}, {}, {}, {})", self.x, self.y, self.z, self.w)
+    }
+}
+
+pub struct Point<T>(T, T, T);
+pub struct Vector<T>(T, T, T);
 
 const fn is_equal_float(a: f64, b: f64) -> bool {
     // Fast path: exact equality (handles infinities, zeros, and exact matches)
