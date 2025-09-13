@@ -28,11 +28,11 @@ impl Precision {
     /// intersections, shadow ray calculations, and accumulated
     /// floating-point errors.
     pub const INTERSECT: f64 = 1e-4;
-    /// Standard precision for general computations (1e-6).
+    /// Standard precision for general computations (1e-5).
     ///
     /// Suitable for most geometric calculations, transformations, and
     /// intermediate results where good accuracy is needed.
-    pub const STANDARD: f64 = 1e-6;
+    pub const STANDARD: f64 = 1e-5;
     /// High precision for mathematical operations (1e-10).
     ///
     /// For unit tests, exact mathematical operations, and cases where

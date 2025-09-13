@@ -166,3 +166,25 @@ fn then_var_div_value_equals_tuple(
 }
 
 // ------------------------------------------------------------------------------
+#[then(regex = r"^magnitude\(([a-zA-Z_][a-zA-Z0-9_]*)\) = (.+)$")]
+fn then_magnitude_var_equals_value(world: &mut TestWorld, a: String, v: String) {
+    let t = *(world.get::<Tuple>(&a).unwrap());
+
+    let actual = t.magnitude();
+    let expected = v.strip_prefix('√').map_or_else(
+        || v.parse::<f64>().unwrap(), // Closure creation overhead
+        |rest| rest.parse::<f64>().unwrap().sqrt(),
+    );
+    assert!(actual == expected, "Expected {:?}, got {:?}", expected, actual);
+}
+
+#[then(
+    regex = r"^normalize\(([a-zA-Z_][a-zA-Z0-9_]*)\) = (?:approximately )?vector\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([^)]+)\)$"
+)]
+fn then_normalize_var_equals_vector(world: &mut TestWorld, a: String, x: f64, y: f64, z: f64) {
+    let t = *(world.get::<Tuple>(&a).unwrap());
+
+    let actual = t.normalize().unwrap();
+    let expected = vector(x, y, z);
+    assert!(actual == expected, "Expected {:?}, got {:?}", expected, actual);
+}
