@@ -37,4 +37,7 @@
   "rust-analyzer.assist.emitMustUse": true,
   "rust-analyzer.semanticHighlighting.punctuation.enable": true,
   "markdown.validate.enabled": true,
+  "workbench.editor.customLabels.patterns": {
+    "**/mod.rs": "${dirname}.rs"
+  },
 }
