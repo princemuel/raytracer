@@ -1,4 +1,5 @@
 Feature: Tuples, Vectors, and Points
+
     Scenario: A tuple with w=1.0 is a point
         Given a ← tuple(4.3, -4.2, 3.1, 1.0)
         Then a.x = 4.3
@@ -35,15 +36,15 @@ Feature: Tuples, Vectors, and Points
         And p2 ← point(5, 6, 7)
         Then p1 - p2 = vector(-2, -4, -6)
 
-    Scenario: Subtracting two vectors
-        Given v1 ← vector(3, 2, 1)
-        And v2 ← vector(5, 6, 7)
-        Then v1 - v2 = vector(-2, -4, -6)
-
     Scenario: Subtracting a vector from a point
         Given p ← point(3, 2, 1)
         And v ← vector(5, 6, 7)
         Then p - v = point(-2, -4, -6)
+
+    Scenario: Subtracting two vectors
+        Given v1 ← vector(3, 2, 1)
+        And v2 ← vector(5, 6, 7)
+        Then v1 - v2 = vector(-2, -4, -6)
 
     Scenario: Subtracting a vector from the zero vector
         Given zero ← vector(0, 0, 0)
@@ -99,3 +100,51 @@ Feature: Tuples, Vectors, and Points
         Given v ← vector(1, 2, 3)
         When norm ← normalize(v)
         Then magnitude(norm) = 1
+
+    Scenario: The dot product of two tuples
+        Given a ← vector(1, 2, 3)
+        And b ← vector(2, 3, 4)
+        Then dot(a, b) = 20
+
+    Scenario: The cross product of two vectors
+        Given a ← vector(1, 2, 3)
+        And b ← vector(2, 3, 4)
+        Then cross(a, b) = vector(-1, 2, -1)
+        And cross(b, a) = vector(1, -2, 1)
+
+    Scenario: Colors are (red, green, blue) tuples
+        Given c ← color(-0.5, 0.4, 1.7)
+        Then c.red = -0.5
+        And c.green = 0.4
+        And c.blue = 1.7
+
+    Scenario: Adding colors
+        Given c1 ← color(0.9, 0.6, 0.75)
+        And c2 ← color(0.7, 0.1, 0.25)
+        Then c1 + c2 = color(1.6, 0.7, 1.0)
+
+    Scenario: Subtracting colors
+        Given c1 ← color(0.9, 0.6, 0.75)
+        And c2 ← color(0.7, 0.1, 0.25)
+        Then c1 - c2 = color(0.2, 0.5, 0.5)
+
+    Scenario: Multiplying a color by a scalar
+        Given c ← color(0.2, 0.3, 0.4)
+        Then c * 2 = color(0.4, 0.6, 0.8)
+
+    Scenario: Multiplying colors
+        Given c1 ← color(1, 0.2, 0.4)
+        And c2 ← color(0.9, 1, 0.1)
+        Then c1 * c2 = color(0.9, 0.2, 0.04)
+
+    Scenario: Reflecting a vector approaching at 45°
+        Given v ← vector(1, -1, 0)
+        And n ← vector(0, 1, 0)
+        When r ← reflect(v, n)
+        Then r = vector(1, 1, 0)
+
+    Scenario: Reflecting a vector off a slanted surface
+        Given v ← vector(0, -1, 0)
+        And n ← vector(√2/2, √2/2, 0)
+        When r ← reflect(v, n)
+        Then r = vector(1, 0, 0)
