@@ -1,28 +1,26 @@
-//! Floating-point precision utilities for ray tracing
+//! # Floating-Point Precision Utilities
 //!
-//! This module provides trait-based floating-point equality testing that works
-//! across f32 and f64, with specialized implementations for graphics
-//! operations.
-//!
-//! # The Problem
+//! This module provides epsilon values and comparison helpers used by
+//! geometry types in the ray tracer. Equality on types like `Point` and
+//! `Vector` is based on tolerant comparison.
 //!
 //! ```rust
-//! let a = 0.1_f64 + 0.2;
-//! let b = 0.3_f64;
-//! assert_eq!(a, b); // This will fail!
-//! // a = 0.30000000000000004, b = 0.3
+//! use raytracer::prelude::*;
+//!
+//! let a = point(0.1 + 0.2, 0.0, 0.0);
+//! let b = point(0.3, 0.0, 0.0);
+//! assert_eq!(a, b); // works because PartialEq uses epsilon
 //! ```
 //!
-//! # The Solution
+//! For raw `f64` values, use [`is_equal_float`]:
 //!
 //! ```rust
-//! use raytracer::math::epsilon::ApproxEq;
+//! use raytracer::math::epsilon::is_equal_float;
 //!
 //! let a = 0.1_f64 + 0.2;
 //! let b = 0.3_f64;
-//! assert!(a.approx_eq(b)); // This passes!
+//! assert!(is_equal_float(a, b));
 //! ```
-
 // ================================
 // Epsilon Constants
 // ================================
