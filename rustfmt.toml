@@ -45,5 +45,5 @@ struct_field_align_threshold = 20
 struct_lit_single_line = true
 trailing_comma = "Vertical"
 trailing_semicolon = true
-# where_single_line = true
+where_single_line = false
 wrap_comments = true
