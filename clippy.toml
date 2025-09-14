@@ -20,4 +20,5 @@ trivial-copy-size-limit = 64
 # Other useful settings
 max-fn-params-bools = 6
 max-trait-bounds = 6
+warn-on-all-wildcard-imports = true
 single-char-binding-names-threshold = 6
