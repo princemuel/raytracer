@@ -17,9 +17,14 @@ pub use crate::math::primitives::{ColorRGB, Coordinate3D};
 pub use crate::math::primitives::{color, point, vector};
 
 // ================================
+// Graphics & Rendering
+// ================================
+#[rustfmt::skip]
+pub use crate::graphics::canvas::Canvas;
+
+// ================================
 // Constants & Utilities
 // ================================
-
 pub use crate::math::epsilon::EPSILON;
 
 // Common numerical constants

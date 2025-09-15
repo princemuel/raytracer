@@ -9,6 +9,7 @@
 //! use raytracer::prelude::*;
 //! ```
 #![warn(clippy::self_named_module_files)]
+#![feature(stmt_expr_attributes)]
 pub mod error;
 pub mod geometry;
 pub mod graphics;
