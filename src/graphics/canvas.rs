@@ -55,6 +55,13 @@ impl Canvas {
         &mut self.pixels[idx]
     }
 
+    // pub fn write_pixel<T, U>(&mut self, x: T, y: U, color: Color3)
+    // where
+    //     T: Into<usize>,
+    //     U: Into<usize>,
+    // {
+    //     *self.pixel_at_mut(x.into(), y.into()) = color;
+    // }
     pub fn write_pixel(&mut self, x: usize, y: usize, color: Color3) { *self.pixel_at_mut(x, y) = color; }
 
     pub fn to_ppm(&self) -> String {

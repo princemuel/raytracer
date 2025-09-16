@@ -26,7 +26,7 @@ fn when_write_pixel(world: &mut TestWorld, canvas: String, x: usize, y: usize, c
         .get_mut::<Canvas>(&canvas)
         .unwrap_or_else(|| panic!("Canvas {} not found", canvas));
 
-    *canvas.pixel_at_mut(x, y) = color;
+    canvas.write_pixel(x, y, color);
 }
 
 #[when(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← canvas_to_ppm\(([a-zA-Z_][a-zA-Z0-9_]*)\)$")]

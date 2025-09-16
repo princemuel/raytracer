@@ -1,3 +1,5 @@
+use std::fs::File;
+use std::io::BufWriter;
 use std::{fs, io};
 
 use raytracer::prelude::*;
@@ -7,36 +9,36 @@ fn main() -> io::Result<()> {
 
     fs::create_dir_all("output")?;
 
-    let file = fs::File::create("output/ch01_projectile.txt")?;
+    let file = File::create("output/ch01_projectile.txt")?;
 
-    let mut buffer = io::BufWriter::new(file);
+    let mut buffer = BufWriter::new(file);
 
-    let mut projectile = Projectile {
-        position: point(0, 1, 0),
+    let mut p = Projectile {
         velocity: unsafe { vector(1, 1, 0).normalize_unchecked() },
+        position: point(0, 1, 0),
     };
-    let environment = Environment {
-        gravity: vector(0.0, -0.1, 0.0),
-        wind:    vector(-0.01, 0.0, 0.0),
+    let e = Environment {
+        wind:    vector(-0.01, 0, 0),
+        gravity: vector(0, -0.1, 0),
     };
 
-    while projectile.position.y() >= 0.0 {
-        let x = projectile.position.x();
-        let y = projectile.position.y();
-        let z = projectile.position.z();
+    while p.position.y() >= 0.0 {
+        let x = p.position.x();
+        let y = p.position.y();
+        let z = p.position.z();
 
         writeln!(&mut buffer, " x: {x:.2}\t|\ty: {y:.2}\t|\tz: {z:.2}",)?;
 
-        projectile = tick(projectile, environment);
+        p = tick(p, e);
     }
 
     Ok(())
 }
 
-fn tick(mut projectile: Projectile, environment: Environment) -> Projectile {
-    projectile.position = projectile.position + projectile.velocity;
-    projectile.velocity = projectile.velocity + environment.gravity + environment.wind;
-    projectile
+fn tick(mut p: Projectile, e: Environment) -> Projectile {
+    p.position = p.position + p.velocity;
+    p.velocity = p.velocity + e.gravity + e.wind;
+    p
 }
 
 #[derive(Default, Debug, Clone, Copy)]

@@ -3,40 +3,42 @@ use std::{fs, io};
 use raytracer::prelude::*;
 
 fn main() -> io::Result<()> {
-    use io::Write as _;
-
     fs::create_dir_all("output")?;
 
-    let file = fs::File::create("output/ch01_projectile.txt")?;
-
-    let mut buffer = io::BufWriter::new(file);
-
-    let mut projectile = Projectile {
+    let mut canvas = canvas(900usize, 550usize);
+    let mut p = Projectile {
         position: point(0, 1, 0),
-        velocity: unsafe { vector(1, 1, 0).normalize_unchecked() },
-    };
-    let environment = Environment {
-        gravity: vector(0.0, -0.1, 0.0),
-        wind:    vector(-0.01, 0.0, 0.0),
+        velocity: unsafe { vector(1, 1.8, 0).normalize_unchecked() * 11.25 },
     };
 
-    while projectile.position.y() >= 0.0 {
-        let x = projectile.position.x();
-        let y = projectile.position.y();
-        let z = projectile.position.z();
+    let color = Color3::red();
+    let e = Environment {
+        gravity: vector(0, -0.1, 0),
+        wind:    vector(-0.01, 0, 0),
+    };
 
-        writeln!(&mut buffer, " x: {x:.2}\t|\ty: {y:.2}\t|\tz: {z:.2}",)?;
+    while p.position.y() > 0.0 {
+        let x = p.position.x().round() as usize;
+        let y = p.position.y().round() as usize;
 
-        projectile = tick(projectile, environment);
+        for w in x..=x + 5 {
+            for h in y..=y + 5 {
+                if w > 0 && w < canvas.width() && h > 0 && h < canvas.height() {
+                    canvas.write_pixel(w, canvas.height() - h, color);
+                }
+            }
+        }
+
+        p = tick(p, e);
     }
 
-    Ok(())
+    canvas.write_to_file("output/ch02_projectile.ppm")
 }
 
-fn tick(mut projectile: Projectile, environment: Environment) -> Projectile {
-    projectile.position = projectile.position + projectile.velocity;
-    projectile.velocity = projectile.velocity + environment.gravity + environment.wind;
-    projectile
+fn tick(mut p: Projectile, e: Environment) -> Projectile {
+    p.position = p.position + p.velocity;
+    p.velocity = p.velocity + e.gravity + e.wind;
+    p
 }
 
 #[derive(Default, Debug, Clone, Copy)]
