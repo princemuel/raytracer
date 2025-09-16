@@ -6,9 +6,11 @@ use crate::math::primitives::vector::Vec3;
 
 /// Create a 3D point
 #[inline]
-pub fn point<T>(x: T, y: T, z: T) -> Point3
+pub fn point<X, Y, Z>(x: X, y: Y, z: Z) -> Point3
 where
-    T: core::convert::Into<f64>,
+    X: Into<f64>,
+    Y: Into<f64>,
+    Z: Into<f64>,
 {
     Point3::new(x.into(), y.into(), z.into())
 }

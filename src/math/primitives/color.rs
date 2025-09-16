@@ -5,9 +5,11 @@ use crate::math::primitives::components::ColorRGB;
 
 /// Creates a color
 #[inline]
-pub fn color<T>(r: T, g: T, b: T) -> Color3
+pub fn color<R, G, B>(r: R, g: G, b: B) -> Color3
 where
-    T: core::convert::Into<f64>,
+    R: Into<f64>,
+    G: Into<f64>,
+    B: Into<f64>,
 {
     Color3::new(r.into(), g.into(), b.into())
 }

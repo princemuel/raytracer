@@ -5,9 +5,11 @@ use crate::math::primitives::components::Coordinate3D;
 
 /// Create a 3D vector
 #[inline]
-pub fn vector<T>(x: T, y: T, z: T) -> Vec3
+pub fn vector<X, Y, Z>(x: X, y: Y, z: Z) -> Vec3
 where
-    T: core::convert::Into<f64>,
+    X: Into<f64>,
+    Y: Into<f64>,
+    Z: Into<f64>,
 {
     Vec3::new(x.into(), y.into(), z.into())
 }

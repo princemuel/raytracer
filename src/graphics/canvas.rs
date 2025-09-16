@@ -8,9 +8,10 @@ use crate::math::primitives::Color3;
 
 /// Creates a color
 #[inline]
-pub fn canvas<T>(width: T, height: T) -> Canvas
+pub fn canvas<T, U>(width: T, height: U) -> Canvas
 where
-    T: core::convert::Into<usize>,
+    T: Into<usize>,
+    U: Into<usize>,
 {
     Canvas::new(width.into(), height.into())
 }
