@@ -22,6 +22,9 @@ pub use crate::math::primitives::{color, point, vector};
 #[rustfmt::skip]
 pub use crate::graphics::canvas::Canvas;
 
+#[rustfmt::skip] // Re-export constructor functions
+pub use crate::graphics::canvas::canvas;
+
 // ================================
 // Constants & Utilities
 // ================================
