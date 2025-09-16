@@ -25,7 +25,7 @@ impl TestWorld {
     }
 
     /// Borrow a mutable value of type T previously inserted under `key`.
-    pub fn _get_mut<T: 'static + Send + Sync>(&mut self, key: &str) -> Option<&mut T> {
+    pub fn get_mut<T: 'static + Send + Sync>(&mut self, key: &str) -> Option<&mut T> {
         self.store.get_mut(key)?.downcast_mut::<T>()
     }
 
