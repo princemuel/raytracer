@@ -80,7 +80,7 @@ fn then_pixel_at_equals_color(world: &mut TestWorld, canvas: String, x: usize, y
         .get::<Canvas>(&canvas)
         .unwrap_or_else(|| panic!("Canvas {} not found", canvas));
 
-    let actual = canvas[x][y];
+    let actual = canvas[y][x];
     assert_eq!(actual, expected);
 }
 
@@ -96,7 +96,7 @@ fn then_every_pixel_is_color(world: &mut TestWorld, canvas: String, r: f64, g: f
     if let Some((x, y, pixel)) = (0..canvas.height())
         .flat_map(|y| (0..canvas.width()).map(move |x| (x, y)))
         .find_map(|(x, y)| {
-            let pixel = canvas[x][y];
+            let pixel = canvas[y][x];
             (pixel != expected).then_some((x, y, pixel))
         })
     {
