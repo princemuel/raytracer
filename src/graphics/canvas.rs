@@ -41,7 +41,7 @@ impl Canvas {
 }
 
 impl Canvas {
-    pub fn write_pixel(&mut self, x: usize, y: usize, color: Color3) { self[x][y] = color; }
+    pub fn write_pixel(&mut self, x: usize, y: usize, color: Color3) { self[y][x] = color; }
 
     pub fn to_ppm(&self) -> String {
         let mut ppm = self.ppm_header();
