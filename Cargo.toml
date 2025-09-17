@@ -1,6 +1,6 @@
 [package]
   name = "raytracer"
-  description = "A ray tracing library based on the book 'The Ray Tracer Challenge' by Jamis Buck."
+  description = "A ray tracer implementation from the \"Ray Tracer Challenge\" book by Jamis Buck."
   homepage = "https://github.com/princemuel/raytracer"
   repository = "https://github.com/princemuel/raytracer"
   version = "0.1.0"
