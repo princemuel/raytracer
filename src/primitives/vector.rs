@@ -1,6 +1,7 @@
 use core::ops::{Add, BitXor, Div, Mul, Neg, Sub};
 
-use crate::math::epsilon::{EPSILON, is_equal_float};
+use crate::cmp::epsilon::EPSILON;
+use crate::cmp::float::is_equal;
 use crate::primitives::tuple::Tuple;
 
 /// Create a 3D vector
@@ -80,8 +81,8 @@ impl Vec3 {
     /// want the reflection to point out of the surface so v + 2b becomes v - 2b
     #[inline]
     pub fn reflect(&self, normal: &Self) -> Self {
-        let (this, that) = (*self, *normal);
-        this - (2.0 * (this ^ that) * that)
+        let (s, n) = (*self, *normal);
+        s - (n * 2.0) * (s ^ n)
     }
 
     /// Linear interpolation between two vectors
@@ -101,7 +102,7 @@ impl Tuple for Vec3 {
 
 impl PartialEq for Vec3 {
     fn eq(&self, rhs: &Self) -> bool {
-        is_equal_float(self.0, rhs.0) && is_equal_float(self.1, rhs.1) && is_equal_float(self.2, rhs.2)
+        is_equal(self.0, rhs.0) && is_equal(self.1, rhs.1) && is_equal(self.2, rhs.2)
     }
 }
 
@@ -180,28 +181,28 @@ mod tests {
     use super::*;
 
     #[test]
-    fn vec3_equality_is_exact() {
+    fn test_equality_is_exact() {
         let t1 = Vec3::new(1.0, 2.0, 3.0);
         let t2 = Vec3::new(1.0, 2.0, 3.0);
         assert_eq!(t1, t2);
     }
 
     #[test]
-    fn vec3_equality_is_inside_epsilon_range() {
+    fn test_equality_is_inside_epsilon_range() {
         let t1 = Vec3::new(1.0, 2.0, 3.0);
         let t2 = Vec3::new(1.0000005, 2.0000001, 2.9999999);
         assert_eq!(t1, t2);
     }
 
     #[test]
-    fn vec3_inequality_is_outside_epsilon_range() {
+    fn test_inequality_is_outside_epsilon_range() {
         let t1 = Vec3::new(1.0, 2.0, 3.0);
         let t2 = Vec3::new(1.0001, 2.0, 3.0);
         assert_ne!(t1, t2);
     }
 
     #[test]
-    fn vec3_equality_with_epsilon_edge_case() {
+    fn test_equality_with_epsilon_edge_case() {
         let epsilon = 1e-5;
 
         let t1 = Vec3::new(1.0, 2.0, 3.0);
@@ -213,26 +214,66 @@ mod tests {
     }
 
     #[test]
-    fn vec3_magnitude_squared_avoids_sqrt() {
+    fn test_magnitude_positive_nonunit() {
+        let t1 = vector(1.0, 2.0, 3.0);
+        assert_eq!(t1.magnitude(), 14.0_f64.sqrt());
+    }
+
+    #[test]
+    fn test_magnitude_negative_nonunit() {
+        let t1 = vector(-1.0, -2.0, -3.0);
+        assert_eq!(t1.magnitude(), 14.0_f64.sqrt());
+    }
+
+    #[test]
+    fn test_magnitude_squared_avoids_sqrt() {
         let v = Vec3::new(3.0, 4.0, 0.0);
         assert_eq!(v.magnitude_sqrd(), 25.0);
         // Cucumber doesn't test this optimization
     }
 
     #[test]
-    fn vec3_zero_magnitude_iz_zero() {
+    fn test_zero_magnitude_is_zero() {
         let v = vector(0.0, 0.0, 0.0);
         assert_eq!(v.magnitude(), 0.0);
     }
 
     #[test]
-    fn vec3_normalize_zero_vector_returns_none() {
+    fn test_normalize_simple_vector() {
+        let t1 = vector(4.0, 0.0, 0.0);
+        assert_eq!(t1.normalize().unwrap(), vector(1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn test_normalize_non_simple_vector() {
+        let t1 = vector(1.0, 2.0, 3.0);
+        let expected_vector = vector(1.0 / 14_f64.sqrt(), 2.0 / 14_f64.sqrt(), 3.0 / 14_f64.sqrt());
+        assert_eq!(t1.normalize().unwrap(), expected_vector);
+    }
+
+    #[test]
+    fn test_normalize_zero_vector_is_none() {
         let zero = Vec3::zero();
         assert_eq!(zero.normalize(), None);
     }
 
     #[test]
-    fn vec3_reflection_approaching_at_45_degrees() {
+    fn test_dot_product_of_two_vectors() {
+        let t1 = Vec3::new(1.0, 2.0, 3.0);
+        let t2 = Vec3::new(2.0, 3.0, 4.0);
+        assert_eq!(t1 ^ t2, 20.0);
+    }
+
+    #[test]
+    fn test_cross_product_of_two_vectors() {
+        let t1 = Vec3::new(1.0, 2.0, 3.0);
+        let t2 = Vec3::new(2.0, 3.0, 4.0);
+        assert_eq!(t1 * t2, Vec3::new(-1.0, 2.0, -1.0));
+        assert_eq!(t2 * t1, Vec3::new(1.0, -2.0, 1.0));
+    }
+
+    #[test]
+    fn test_reflecting_at_45_degrees() {
         let v = vector(1.0, -1.0, 0.0);
         let n = vector(0.0, 1.0, 0.0);
         let r = v.reflect(&n);
@@ -240,11 +281,12 @@ mod tests {
     }
 
     #[test]
-    fn vec3_reflection_off_slanted_surface() {
+    fn test_reflecting_off_slanted_surface() {
         let v = vector(0.0, -1.0, 0.0);
         let sqrt2_div2 = (2.0_f64).sqrt() / 2.0;
-        let n = vector(sqrt2_div2, sqrt2_div2, 0.0);
-        let r = v.reflect(&n);
-        assert_eq!(r, vector(1.0, 0.0, 0.0));
+
+        let normal = vector(sqrt2_div2, sqrt2_div2, 0.0);
+        let reflected = v.reflect(&normal);
+        assert_eq!(reflected, vector(1.0, 0.0, 0.0));
     }
 }

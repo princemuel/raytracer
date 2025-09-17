@@ -1,6 +1,6 @@
 use core::ops::{Add, Sub};
 
-use crate::math::epsilon::is_equal_float;
+use crate::cmp::float::is_equal;
 use crate::primitives::tuple::Tuple;
 use crate::primitives::vector::Vec3;
 
@@ -36,7 +36,7 @@ impl Tuple for Point3 {
 
 impl PartialEq for Point3 {
     fn eq(&self, rhs: &Self) -> bool {
-        is_equal_float(self.0, rhs.0) && is_equal_float(self.1, rhs.1) && is_equal_float(self.2, rhs.2)
+        is_equal(self.0, rhs.0) && is_equal(self.1, rhs.1) && is_equal(self.2, rhs.2)
     }
 }
 

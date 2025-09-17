@@ -33,7 +33,8 @@ pub use crate::graphics::canvas::Canvas;
 // ================================
 // Constants & Utilities
 // ================================
-pub use crate::math::epsilon::{EPSILON, is_equal_float};
+pub use crate::cmp::epsilon::EPSILON;
+pub use crate::cmp::float::is_equal;
 
 // Common numerical constants
 #[rustfmt::skip]

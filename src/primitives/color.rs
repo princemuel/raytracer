@@ -1,6 +1,6 @@
 use core::ops::{Add, Mul, Sub};
 
-use crate::math::epsilon::is_equal_float;
+use crate::cmp::float::is_equal;
 use crate::primitives::tuple::ColorRGB;
 
 /// Creates a color
@@ -48,7 +48,7 @@ impl ColorRGB for Color3 {
 
 impl PartialEq for Color3 {
     fn eq(&self, rhs: &Self) -> bool {
-        is_equal_float(self.0, rhs.0) && is_equal_float(self.1, rhs.1) && is_equal_float(self.2, rhs.2)
+        is_equal(self.0, rhs.0) && is_equal(self.1, rhs.1) && is_equal(self.2, rhs.2)
     }
 }
 

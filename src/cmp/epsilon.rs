@@ -12,14 +12,14 @@
 //! assert_eq!(a, b); // works because PartialEq uses epsilon
 //! ```
 //!
-//! For raw `f64` values, use [`is_equal_float`]:
+//! For raw `f64` values, use [`is_equal`]:
 //!
 //! ```rust
-//! use raytracer::math::epsilon::is_equal_float;
+//! use raytracer::cmp::float::is_equal;
 //!
 //! let a = 0.1_f64 + 0.2;
 //! let b = 0.3_f64;
-//! assert!(is_equal_float(a, b));
+//! assert!(is_equal(a, b));
 //! ```
 // ================================
 // Epsilon Constants
@@ -45,35 +45,3 @@ pub const EPSILON_F32_LOOSE: f32 = 1e-4;
 
 /// Default epsilon for the primary floating-point type used in ray tracing
 pub const EPSILON: f64 = 1e-5;
-
-pub const fn is_equal_float(a: f64, b: f64) -> bool {
-    // Fast path: exact equality (handles infinities, zeros, and exact matches)
-    if a == b {
-        return true;
-    }
-
-    // Handle NaN cases - NaN should never equal anything
-    if a.is_nan() || b.is_nan() {
-        return false;
-    }
-
-    // Handle infinite cases that aren't exactly equal
-    if a.is_infinite() || b.is_infinite() {
-        return false; // Different infinities or one infinite, one finite
-    }
-
-    let diff = (a - b).abs();
-
-    // For very small numbers near zero, use absolute epsilon
-    if a.abs().max(b.abs()) < 1.0 {
-        return diff < EPSILON;
-    }
-
-    // For larger numbers, use relative epsilon to maintain precision
-    // This prevents issues when comparing large coordinate values
-    let relative_epsilon = EPSILON * a.abs().max(b.abs());
-
-    // Use the larger of absolute and relative epsilon
-    // This handles edge cases around 1.0 and ensures consistent behavior
-    diff < EPSILON.max(relative_epsilon)
-}
