@@ -5,7 +5,7 @@ use raytracer::prelude::*;
 fn main() -> io::Result<()> {
     fs::create_dir_all("output")?;
 
-    let mut canvas = canvas(900usize, 550usize);
+    let mut canvas = Canvas::new(900usize, 550usize);
     let mut p = Projectile {
         position: point(0, 1, 0),
         velocity: unsafe { vector(1, 1.8, 0).normalize_unchecked() * 11.25 },
@@ -32,7 +32,7 @@ fn main() -> io::Result<()> {
         p = tick(p, e);
     }
 
-    canvas.write_to_file("output/ch02_projectile.ppm")
+    canvas.export("output/ch02_projectile.ppm")
 }
 
 fn tick(mut p: Projectile, e: Environment) -> Projectile {
