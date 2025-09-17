@@ -1,10 +1,6 @@
-use std::fmt::Write as FmtWrite;
-use std::fs::File;
-use std::io;
-use std::io::Write as IoWrite;
-use std::path::Path;
+use core::ops::{Index, IndexMut};
 
-use crate::math::primitives::Color3;
+use crate::primitives::Color3;
 
 /// Creates a color
 #[inline]
@@ -17,7 +13,7 @@ where
 }
 
 /// A 2D canvas storing colors for ray tracing.
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, PartialEq)]
 pub struct Canvas {
     width:  usize,
     height: usize,
@@ -28,7 +24,7 @@ impl Canvas {
     /// Creates a new canvas filled with default colors (black).
     pub fn new(width: usize, height: usize) -> Self {
         #[rustfmt::skip]
-        Self { width, height, pixels: vec![Color3::default(); width * height] }
+        Self { width, height, pixels: vec![Color3::black(); width * height] }
     }
 
     /// Returns the canvas width.
@@ -45,24 +41,7 @@ impl Canvas {
 }
 
 impl Canvas {
-    #[inline]
-    pub const fn pixel_index(&self, x: usize, y: usize) -> usize { y * self.width + x }
-
-    pub fn pixel_at(&self, x: usize, y: usize) -> Color3 { self.pixels[self.pixel_index(x, y)] }
-
-    pub fn pixel_at_mut(&mut self, x: usize, y: usize) -> &mut Color3 {
-        let idx = self.pixel_index(x, y);
-        &mut self.pixels[idx]
-    }
-
-    // pub fn write_pixel<T, U>(&mut self, x: T, y: U, color: Color3)
-    // where
-    //     T: Into<usize>,
-    //     U: Into<usize>,
-    // {
-    //     *self.pixel_at_mut(x.into(), y.into()) = color;
-    // }
-    pub fn write_pixel(&mut self, x: usize, y: usize, color: Color3) { *self.pixel_at_mut(x, y) = color; }
+    pub fn write_pixel(&mut self, x: usize, y: usize, color: Color3) { self[x][y] = color; }
 
     pub fn to_ppm(&self) -> String {
         let mut ppm = self.ppm_header();
@@ -76,6 +55,8 @@ impl Canvas {
     fn ppm_header(&self) -> String { format!("P3\n{} {}\n255\n", self.width, self.height) }
 
     fn ppm_content(&self) -> String {
+        use ::std::fmt::Write as _;
+
         let mut output = String::with_capacity(self.width * self.height * 12);
 
         for pixel_row in self.pixels().chunks_exact(self.width) {
@@ -103,10 +84,27 @@ impl Canvas {
         output
     }
 
-    pub fn write_to_file(&self, path: impl AsRef<Path>) -> io::Result<()> {
+    pub fn export(&self, path: impl AsRef<::std::path::Path>) -> ::std::io::Result<()> {
+        use ::std::io::Write as _;
         let content = self.to_ppm();
 
-        let mut file = File::create(path)?;
+        let mut file = ::std::fs::File::create(path)?;
         file.write_all(content.as_bytes())
+    }
+}
+
+impl Index<usize> for Canvas {
+    type Output = [Color3];
+
+    fn index(&self, index: usize) -> &Self::Output {
+        let start = self.width * index;
+        &self.pixels[start..start + self.width]
+    }
+}
+
+impl IndexMut<usize> for Canvas {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        let start = self.width * index;
+        &mut self.pixels[start..start + self.width]
     }
 }

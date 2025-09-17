@@ -1,8 +1,8 @@
 use core::ops::{Add, Sub};
 
 use crate::math::epsilon::is_equal_float;
-use crate::math::primitives::components::Coordinate3D;
-use crate::math::primitives::vector::Vec3;
+use crate::primitives::tuple::Tuple;
+use crate::primitives::vector::Vec3;
 
 /// Create a 3D point
 #[inline]
@@ -24,12 +24,14 @@ impl Point3 {
     pub const fn origin() -> Self { Self::new(0.0, 0.0, 0.0) }
 }
 
-impl Coordinate3D for Point3 {
+impl Tuple for Point3 {
     fn x(&self) -> f64 { self.0 }
 
     fn y(&self) -> f64 { self.1 }
 
     fn z(&self) -> f64 { self.2 }
+
+    fn w(&self) -> f64 { 1.0 }
 }
 
 impl PartialEq for Point3 {

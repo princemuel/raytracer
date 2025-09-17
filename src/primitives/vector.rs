@@ -1,7 +1,7 @@
-use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::ops::{Add, BitXor, Div, Mul, Neg, Sub};
 
 use crate::math::epsilon::{EPSILON, is_equal_float};
-use crate::math::primitives::components::Coordinate3D;
+use crate::primitives::tuple::Tuple;
 
 /// Create a 3D vector
 #[inline]
@@ -37,7 +37,7 @@ impl Vec3 {
 impl Vec3 {
     /// Calculate magnitude (length) of vector
     #[inline]
-    pub fn magnitude(&self) -> f64 { (self.0 * self.0 + self.1 * self.1 + self.2 * self.2).sqrt() }
+    pub fn magnitude(&self) -> f64 { f64::sqrt(self.0 * self.0 + self.1 * self.1 + self.2 * self.2) }
 
     /// Calculate squared magnitude (avoids sqrt for comparisons)
     #[inline]
@@ -47,9 +47,9 @@ impl Vec3 {
     ///
     /// Returns `None` if the vector is effectively zero (magnitude < `EPSILON`)
     /// to avoid producing NaN values.
-    pub fn normalize(self) -> Option<Self> {
+    pub fn normalize(&self) -> Option<Self> {
         let magnitude = self.magnitude();
-        (magnitude >= EPSILON).then(|| self / magnitude)
+        (magnitude >= EPSILON).then(|| *self / magnitude)
     }
 
     /// Normalizes the vector to unit length, **without checking for zero
@@ -61,40 +61,42 @@ impl Vec3 {
     ///   producing NaN or infinite components.
     /// - The caller must ensure the vector is non-zero.
     ///
-    /// This is a low-level operation; prefer using [`normalize`] when possible.
-    #[inline]
-    pub unsafe fn normalize_unchecked(self) -> Self { self / self.magnitude() }
-
-    /// The dot product of a vector
-    #[inline]
-    pub fn dot(self, rhs: Self) -> f64 { self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2 }
-
-    /// The cross product of a vector
-    #[inline]
-    pub fn cross(self, rhs: Self) -> Self {
-        Self::new(
-            self.1 * rhs.2 - self.2 * rhs.1,
-            self.2 * rhs.0 - self.0 * rhs.2,
-            self.0 * rhs.1 - self.1 * rhs.0,
-        )
-    }
+    /// This is an unsafe operation; prefer using [`normalize`] when possible.
+    ///
+    /// [`normalize`]: Vec3::normalize
+    pub unsafe fn normalize_unchecked(&self) -> Self { *self / self.magnitude() }
 
     /// Reflect vector across a normal.
     /// Normal should be normalized for correct results
+    ///
+    /// reflected ray direction of a ray v = v + 2b where v is the vector and b
+    /// is height of v parallel to the normal n is unit vector of len 1 but
+    /// v may not be To get b, we scale normal vector by the length of the
+    /// projection of v onto n basically perpendicular height of v as said
+    /// before this is given by dot product of v and n
+    ///
+    /// if n were not a unit vector, we'd also need to divide this dot product
+    /// by length of n i.e, normalize it now v point onto the surface and we
+    /// want the reflection to point out of the surface so v + 2b becomes v - 2b
     #[inline]
-    pub fn reflect(self, normal: Self) -> Self { self - 2.0 * self.dot(normal) * normal }
+    pub fn reflect(&self, normal: &Self) -> Self {
+        let (this, that) = (*self, *normal);
+        this - (2.0 * (this ^ that) * that)
+    }
 
     /// Linear interpolation between two vectors
     #[inline]
-    pub fn lerp(self, other: Self, t: f64) -> Self { self + t * (other - self) }
+    pub fn lerp(&self, other: &Self, t: f64) -> Self { *self + t * (*other - *self) }
 }
 
-impl Coordinate3D for Vec3 {
+impl Tuple for Vec3 {
     fn x(&self) -> f64 { self.0 }
 
     fn y(&self) -> f64 { self.1 }
 
     fn z(&self) -> f64 { self.2 }
+
+    fn w(&self) -> f64 { 0.0 }
 }
 
 impl PartialEq for Vec3 {
@@ -108,22 +110,46 @@ impl Add for Vec3 {
 
     fn add(self, rhs: Self) -> Self::Output { Self::new(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2) }
 }
+
 impl Sub for Vec3 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output { Self::new(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2) }
 }
+
 impl Neg for Vec3 {
     type Output = Self;
 
     fn neg(self) -> Self::Output { Self::new(-self.0, -self.1, -self.2) }
 }
+
+// "Dot" product (or "scalar" product)
+impl BitXor for Vec3 {
+    type Output = f64;
+
+    fn bitxor(self, rhs: Self) -> Self::Output { self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2 }
+}
+
+// "Cross" product
+impl Mul for Vec3 {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self::new(
+            self.1 * rhs.2 - self.2 * rhs.1,
+            self.2 * rhs.0 - self.0 * rhs.2,
+            self.0 * rhs.1 - self.1 * rhs.0,
+        )
+    }
+}
+
 // Scalar multiplication
 impl Mul<f64> for Vec3 {
     type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output { Self::new(self.0 * rhs, self.1 * rhs, self.2 * rhs) }
 }
+
 impl Mul<Vec3> for f64 {
     type Output = Vec3;
 
@@ -209,7 +235,7 @@ mod tests {
     fn vec3_reflection_approaching_at_45_degrees() {
         let v = vector(1.0, -1.0, 0.0);
         let n = vector(0.0, 1.0, 0.0);
-        let r = v.reflect(n);
+        let r = v.reflect(&n);
         assert_eq!(r, vector(1.0, 1.0, 0.0));
     }
 
@@ -218,7 +244,7 @@ mod tests {
         let v = vector(0.0, -1.0, 0.0);
         let sqrt2_div2 = (2.0_f64).sqrt() / 2.0;
         let n = vector(sqrt2_div2, sqrt2_div2, 0.0);
-        let r = v.reflect(n);
+        let r = v.reflect(&n);
         assert_eq!(r, vector(1.0, 0.0, 0.0));
     }
 }

@@ -1,7 +1,7 @@
 use core::ops::{Add, Mul, Sub};
 
 use crate::math::epsilon::is_equal_float;
-use crate::math::primitives::components::ColorRGB;
+use crate::primitives::tuple::ColorRGB;
 
 /// Creates a color
 #[inline]
@@ -82,8 +82,8 @@ impl Mul<Color3> for f64 {
     fn mul(self, rhs: Color3) -> Self::Output { rhs * self }
 }
 
-// Color3 multiplication (component-wise - Hadamard product)
-impl Mul<Color3> for Color3 {
+// Hadamard product
+impl Mul for Color3 {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -93,6 +93,11 @@ impl Mul<Color3> for Color3 {
 
 const INV_255: f64 = 1.0 / 255.0;
 
+impl From<(u8, u8, u8)> for Color3 {
+    fn from((r, g, b): (u8, u8, u8)) -> Self {
+        Self::new(r as f64 * INV_255, g as f64 * INV_255, b as f64 * INV_255)
+    }
+}
 impl From<[u8; 3]> for Color3 {
     fn from(rgb: [u8; 3]) -> Self {
         Self::new(
@@ -102,13 +107,6 @@ impl From<[u8; 3]> for Color3 {
         )
     }
 }
-
-impl From<(u8, u8, u8)> for Color3 {
-    fn from((r, g, b): (u8, u8, u8)) -> Self {
-        Self::new(r as f64 * INV_255, g as f64 * INV_255, b as f64 * INV_255)
-    }
-}
-
 impl From<Color3> for [u8; 3] {
     fn from(color: Color3) -> Self {
         [

@@ -1,11 +1,12 @@
 //! # Errors
 //! This module defines all the errors that can occur during ray tracing
 //! operations.
-use core::fmt;
+use std::error::Error;
+use std::fmt;
 
 /// The main error type for all ray tracer operations
 #[derive(Debug)]
-pub enum RayTraceError {
+pub enum TracerError {
     /// Mathematical operation errors
     Math(MathError),
 
@@ -233,24 +234,21 @@ pub enum ConfigError {
     },
 }
 
-/// Convenient Result type alias
-pub type Result<T> = core::result::Result<T, RayTraceError>;
-
 // ================================
 // Error Display Implementations
 // ================================
 
-impl fmt::Display for RayTraceError {
+impl fmt::Display for TracerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            RayTraceError::Math(e) => write!(f, "Math error: {}", e),
-            RayTraceError::Graphics(e) => write!(f, "Graphics error: {}", e),
-            RayTraceError::Geometry(e) => write!(f, "Geometry error: {}", e),
-            RayTraceError::Shading(e) => write!(f, "Shading error: {}", e),
-            RayTraceError::World(e) => write!(f, "World error: {}", e),
-            RayTraceError::Io(e) => write!(f, "I/O error: {}", e),
-            RayTraceError::Config(e) => write!(f, "Configuration error: {}", e),
-            RayTraceError::Other(error) => write!(f, "Error: {}", error),
+            Self::Math(e) => write!(f, "Math error: {}", e),
+            Self::Graphics(e) => write!(f, "Graphics error: {}", e),
+            Self::Geometry(e) => write!(f, "Geometry error: {}", e),
+            Self::Shading(e) => write!(f, "Shading error: {}", e),
+            Self::World(e) => write!(f, "World error: {}", e),
+            Self::Io(e) => write!(f, "I/O error: {}", e),
+            Self::Config(e) => write!(f, "Configuration error: {}", e),
+            Self::Other(error) => write!(f, "Error: {}", error),
         }
     }
 }
@@ -258,30 +256,30 @@ impl fmt::Display for RayTraceError {
 impl fmt::Display for MathError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MathError::DivisionByZero { operation, value } => {
+            Self::DivisionByZero { operation, value } => {
                 write!(f, "Division by zero in {}: value was {}", operation, value)
             },
-            MathError::MatrixNotInvertible { matrix_type } => {
+            Self::MatrixNotInvertible { matrix_type } => {
                 write!(
                     f,
                     "{} matrix is not invertible (determinant is zero)",
                     matrix_type
                 )
             },
-            MathError::InvalidVector { operation, vector } => {
+            Self::InvalidVector { operation, vector } => {
                 write!(
                     f,
                     "Invalid vector for {}: ({}, {}, {})",
                     operation, vector[0], vector[1], vector[2]
                 )
             },
-            MathError::InvalidTransform {
+            Self::InvalidTransform {
                 transform_type,
                 reason,
             } => {
                 write!(f, "Invalid {} transformation: {}", transform_type, reason)
             },
-            MathError::PrecisionError {
+            Self::PrecisionError {
                 operation,
                 expected,
                 actual,
@@ -300,7 +298,7 @@ impl fmt::Display for MathError {
 impl fmt::Display for GraphicsError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            GraphicsError::InvalidDimensions {
+            Self::InvalidDimensions {
                 width,
                 height,
                 max_size,
@@ -311,14 +309,14 @@ impl fmt::Display for GraphicsError {
                     width, height, max_size
                 )
             },
-            GraphicsError::PixelOutOfBounds { x, y, width, height } => {
+            Self::PixelOutOfBounds { x, y, width, height } => {
                 write!(
                     f,
                     "Pixel ({}, {}) is out of bounds for {}x{} canvas",
                     x, y, width, height
                 )
             },
-            GraphicsError::InvalidColorValue {
+            Self::InvalidColorValue {
                 component,
                 value,
                 valid_range,
@@ -329,10 +327,10 @@ impl fmt::Display for GraphicsError {
                     component, value, valid_range.0, valid_range.1
                 )
             },
-            GraphicsError::InvalidCamera { reason } => {
+            Self::InvalidCamera { reason } => {
                 write!(f, "Invalid camera configuration: {}", reason)
             },
-            GraphicsError::RayCastError { reason } => {
+            Self::RayCastError { reason } => {
                 write!(f, "Ray casting failed: {}", reason)
             },
         }
@@ -342,7 +340,7 @@ impl fmt::Display for GraphicsError {
 impl fmt::Display for GeometryError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            GeometryError::NoIntersection {
+            Self::NoIntersection {
                 shape_type,
                 ray_origin,
                 ray_direction,
@@ -360,7 +358,7 @@ impl fmt::Display for GeometryError {
                     ray_direction[2]
                 )
             },
-            GeometryError::InvalidShape {
+            Self::InvalidShape {
                 shape_type,
                 parameter,
                 value,
@@ -368,7 +366,7 @@ impl fmt::Display for GeometryError {
             } => {
                 write!(f, "Invalid {} {}: {} ({})", shape_type, parameter, value, reason)
             },
-            GeometryError::TransformStackOverflow {
+            Self::TransformStackOverflow {
                 current_depth,
                 max_depth,
             } => {
@@ -377,7 +375,7 @@ impl fmt::Display for GeometryError {
                     "Transform stack overflow: {current_depth} levels (max: {max_depth})",
                 )
             },
-            GeometryError::InvalidUvCoordinates { u, v, shape_type } => {
+            Self::InvalidUvCoordinates { u, v, shape_type } => {
                 write!(f, "Invalid UV coordinates ({}, {}) for {}", u, v, shape_type)
             },
         }
@@ -387,7 +385,7 @@ impl fmt::Display for GeometryError {
 impl fmt::Display for ShadingError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ShadingError::InvalidMaterial {
+            Self::InvalidMaterial {
                 property,
                 value,
                 valid_range,
@@ -398,10 +396,10 @@ impl fmt::Display for ShadingError {
                     property, value, valid_range.0, valid_range.1
                 )
             },
-            ShadingError::PatternError { pattern_type, reason } => {
+            Self::PatternError { pattern_type, reason } => {
                 write!(f, "Pattern generation failed for {}: {}", pattern_type, reason)
             },
-            ShadingError::LightingError {
+            Self::LightingError {
                 reason,
                 light_position,
                 surface_point,
@@ -419,7 +417,7 @@ impl fmt::Display for ShadingError {
                     surface_point[2]
                 )
             },
-            ShadingError::RecursionLimitExceeded {
+            Self::RecursionLimitExceeded {
                 current_depth,
                 max_depth,
                 ray_type,
@@ -437,18 +435,18 @@ impl fmt::Display for ShadingError {
 impl fmt::Display for WorldError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            WorldError::EmptyScene => write!(f, "Scene contains no objects to render"),
-            WorldError::NoLights => write!(f, "Scene contains no lights"),
-            WorldError::TooManyObjects { count, max_count } => {
+            Self::EmptyScene => write!(f, "Scene contains no objects to render"),
+            Self::NoLights => write!(f, "Scene contains no lights"),
+            Self::TooManyObjects { count, max_count } => {
                 write!(f, "Too many objects in scene: {} (max: {})", count, max_count)
             },
-            WorldError::ObjectNotFound { object_id } => {
+            Self::ObjectNotFound { object_id } => {
                 write!(f, "Object not found: {}", object_id)
             },
-            WorldError::LightNotFound { light_id } => {
+            Self::LightNotFound { light_id } => {
                 write!(f, "Light not found: {}", light_id)
             },
-            WorldError::InvalidHierarchy { reason } => {
+            Self::InvalidHierarchy { reason } => {
                 write!(f, "Invalid scene hierarchy: {}", reason)
             },
         }
@@ -458,14 +456,14 @@ impl fmt::Display for WorldError {
 impl fmt::Display for IoError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            IoError::FileOperation {
+            Self::FileOperation {
                 operation,
                 filename,
                 source,
             } => {
                 write!(f, "Failed to {} file '{}': {}", operation, filename, source)
             },
-            IoError::UnsupportedFormat {
+            Self::UnsupportedFormat {
                 filename,
                 format,
                 supported_formats,
@@ -478,7 +476,7 @@ impl fmt::Display for IoError {
                     supported_formats.join(", ")
                 )
             },
-            IoError::ParseError {
+            Self::ParseError {
                 filename,
                 line_number,
                 reason,
@@ -486,7 +484,7 @@ impl fmt::Display for IoError {
                 Some(line) => write!(f, "Parse error in '{}' at line {}: {}", filename, line, reason),
                 None => write!(f, "Parse error in '{}': {}", filename, reason),
             },
-            IoError::NetworkError { url, reason } => {
+            Self::NetworkError { url, reason } => {
                 write!(f, "Network error accessing '{}': {}", url, reason)
             },
         }
@@ -496,7 +494,7 @@ impl fmt::Display for IoError {
 impl fmt::Display for ConfigError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ConfigError::MissingConfig {
+            Self::MissingConfig {
                 config_key,
                 config_file,
             } => {
@@ -506,7 +504,7 @@ impl fmt::Display for ConfigError {
                     config_key, config_file
                 )
             },
-            ConfigError::InvalidConfig {
+            Self::InvalidConfig {
                 config_key,
                 value,
                 expected_type,
@@ -517,10 +515,10 @@ impl fmt::Display for ConfigError {
                     config_key, value, expected_type
                 )
             },
-            ConfigError::CorruptedConfig { config_file, reason } => {
+            Self::CorruptedConfig { config_file, reason } => {
                 write!(f, "Corrupted configuration file '{}': {}", config_file, reason)
             },
-            ConfigError::VersionMismatch {
+            Self::VersionMismatch {
                 required_version,
                 found_version,
                 component,
@@ -538,17 +536,17 @@ impl fmt::Display for ConfigError {
 // ================================
 // Error Conversion Implementations
 // ================================
-impl std::error::Error for MathError {}
-impl std::error::Error for GraphicsError {}
-impl std::error::Error for GeometryError {}
-impl std::error::Error for ShadingError {}
-impl std::error::Error for WorldError {}
-impl std::error::Error for IoError {}
-impl std::error::Error for ConfigError {}
+impl Error for MathError {}
+impl Error for GraphicsError {}
+impl Error for GeometryError {}
+impl Error for ShadingError {}
+impl Error for WorldError {}
+impl Error for IoError {}
+impl Error for ConfigError {}
 
-impl From<std::io::Error> for RayTraceError {
+impl From<std::io::Error> for TracerError {
     fn from(error: std::io::Error) -> Self {
-        RayTraceError::Io(IoError::FileOperation {
+        TracerError::Io(IoError::FileOperation {
             operation: "unknown".to_string(),
             filename:  "unknown".to_string(),
             source:    error,
@@ -556,38 +554,38 @@ impl From<std::io::Error> for RayTraceError {
     }
 }
 
-impl From<MathError> for RayTraceError {
-    fn from(error: MathError) -> Self { RayTraceError::Math(error) }
+impl From<MathError> for TracerError {
+    fn from(e: MathError) -> Self { Self::Math(e) }
 }
 
-impl From<GraphicsError> for RayTraceError {
-    fn from(error: GraphicsError) -> Self { RayTraceError::Graphics(error) }
+impl From<GraphicsError> for TracerError {
+    fn from(e: GraphicsError) -> Self { Self::Graphics(e) }
 }
 
-impl From<GeometryError> for RayTraceError {
-    fn from(error: GeometryError) -> Self { RayTraceError::Geometry(error) }
+impl From<GeometryError> for TracerError {
+    fn from(e: GeometryError) -> Self { Self::Geometry(e) }
 }
 
-impl From<ShadingError> for RayTraceError {
-    fn from(error: ShadingError) -> Self { RayTraceError::Shading(error) }
+impl From<ShadingError> for TracerError {
+    fn from(e: ShadingError) -> Self { Self::Shading(e) }
 }
 
-impl From<WorldError> for RayTraceError {
-    fn from(error: WorldError) -> Self { RayTraceError::World(error) }
+impl From<WorldError> for TracerError {
+    fn from(e: WorldError) -> Self { Self::World(e) }
 }
 
-impl From<IoError> for RayTraceError {
-    fn from(error: IoError) -> Self { RayTraceError::Io(error) }
+impl From<IoError> for TracerError {
+    fn from(e: IoError) -> Self { Self::Io(e) }
 }
 
-impl From<ConfigError> for RayTraceError {
-    fn from(error: ConfigError) -> Self { RayTraceError::Config(error) }
+impl From<ConfigError> for TracerError {
+    fn from(e: ConfigError) -> Self { Self::Config(e) }
 }
 
-impl From<String> for RayTraceError {
-    fn from(error: String) -> Self { RayTraceError::Other(error) }
+impl From<String> for TracerError {
+    fn from(e: String) -> Self { Self::Other(e) }
 }
 
-impl From<&str> for RayTraceError {
-    fn from(error: &str) -> Self { RayTraceError::Other(error.to_string()) }
+impl From<&str> for TracerError {
+    fn from(e: &str) -> Self { Self::Other(e.to_string()) }
 }
