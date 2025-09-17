@@ -53,7 +53,7 @@ fn when_normalize(world: &mut TestWorld, result: String, vector: String) {
 fn when_reflect(world: &mut TestWorld, result: String, vector: String, normal: String) {
     let v = world.get::<Vec3>(&vector).unwrap();
     let n = world.get::<Vec3>(&normal).unwrap();
-    let reflected = v.reflect(*n);
+    let reflected = v.reflect(n);
     world.insert(&result, reflected);
 }
 
@@ -447,7 +447,7 @@ fn then_dot_equals(world: &mut TestWorld, a: String, b: String, expected: f64) {
     let vector_b = world
         .get::<Vec3>(&b)
         .unwrap_or_else(|| panic!("Vector {} not found", b));
-    let result = vector_a.dot(*vector_b);
+    let result = *vector_a ^ *vector_b;
     assert_eq!(result, expected);
 }
 
@@ -461,7 +461,8 @@ fn then_cross_equals_vector(world: &mut TestWorld, a: String, b: String, x: f64,
     let vector_b = world
         .get::<Vec3>(&b)
         .unwrap_or_else(|| panic!("Vector {} not found", b));
-    let result = vector_a.cross(*vector_b);
+
+    let result = *vector_a * *vector_b;
     let expected = Vec3::new(x, y, z);
     assert_eq!(result, expected);
 }

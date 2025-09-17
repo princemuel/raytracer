@@ -25,9 +25,9 @@ pub fn get_as_tuple(world: &TestWorld, name: &str) -> Tuple4 {
     if let Some(tuple) = world.get::<Tuple4>(name) {
         *tuple
     } else if let Some(point) = world.get::<Point3>(name) {
-        Tuple4::new(point.x(), point.y(), point.z(), 1.0)
+        Tuple4::new(point.x(), point.y(), point.z(), point.w())
     } else if let Some(vector) = world.get::<Vec3>(name) {
-        Tuple4::new(vector.x(), vector.y(), vector.z(), 0.0)
+        Tuple4::new(vector.x(), vector.y(), vector.z(), vector.w())
     } else {
         panic!("Variable {} not found", name);
     }

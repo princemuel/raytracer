@@ -9,7 +9,7 @@ use crate::support::world::TestWorld;
 // ===============================================================================
 #[given(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← canvas\(([-+]?\d+), ([-+]?\d+)\)$")]
 fn given_canvas(world: &mut TestWorld, name: String, width: usize, height: usize) {
-    world.insert(&name, canvas(width, height));
+    world.insert(&name, Canvas::new(width, height));
 }
 
 // ===============================================================================
@@ -80,7 +80,7 @@ fn then_pixel_at_equals_color(world: &mut TestWorld, canvas: String, x: usize, y
         .get::<Canvas>(&canvas)
         .unwrap_or_else(|| panic!("Canvas {} not found", canvas));
 
-    let actual = canvas.pixel_at(x, y);
+    let actual = canvas[x][y];
     assert_eq!(actual, expected);
 }
 
@@ -96,7 +96,7 @@ fn then_every_pixel_is_color(world: &mut TestWorld, canvas: String, r: f64, g: f
     if let Some((x, y, pixel)) = (0..canvas.height())
         .flat_map(|y| (0..canvas.width()).map(move |x| (x, y)))
         .find_map(|(x, y)| {
-            let pixel = canvas.pixel_at(x, y);
+            let pixel = canvas[x][y];
             (pixel != expected).then_some((x, y, pixel))
         })
     {
