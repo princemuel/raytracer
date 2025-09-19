@@ -128,7 +128,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn round_trip_rgb() {
+    fn test_round_trip_rgb_conversion() {
         for r in 0..=255u8 {
             for g in [0, 64, 128, 192, 255] {
                 for b in [0, 127, 255] {

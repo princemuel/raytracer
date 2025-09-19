@@ -2,32 +2,25 @@
 //! This module defines all the errors that can occur during ray tracing
 //! operations.
 use std::error::Error;
-use std::fmt;
+use std::{fmt, io};
 
 /// The main error type for all ray tracer operations
 #[derive(Debug)]
 pub enum TracerError {
     /// Mathematical operation errors
     Math(MathError),
-
     /// Canvas and image processing errors
     Graphics(GraphicsError),
-
     /// 3D geometry and intersection errors
     Geometry(GeometryError),
-
     /// Material and shading errors
     Shading(ShadingError),
-
     /// Scene and world management errors
     World(WorldError),
-
     /// File I/O errors
     Io(IoError),
-
     /// Configuration and parsing errors
     Config(ConfigError),
-
     /// Generic error with custom message
     Other(String),
 }
@@ -37,19 +30,15 @@ pub enum TracerError {
 pub enum MathError {
     /// Division by zero or near-zero value
     DivisionByZero { operation: String, value: f64 },
-
     /// Matrix is not invertible (determinant is zero)
-    MatrixNotInvertible { matrix_type: String },
-
+    MatrixNotInvertible { matrix: String },
     /// Invalid vector operation (e.g., normalizing zero vector)
     InvalidVector { operation: String, vector: [f64; 3] },
-
     /// Invalid transformation parameters
     InvalidTransform {
         transform_type: String,
         reason:         String,
     },
-
     /// Numerical precision issues
     PrecisionError {
         operation: String,
@@ -68,7 +57,6 @@ pub enum GraphicsError {
         height:   usize,
         max_size: usize,
     },
-
     /// Pixel coordinates are out of bounds
     PixelOutOfBounds {
         x:      usize,
@@ -76,17 +64,14 @@ pub enum GraphicsError {
         width:  usize,
         height: usize,
     },
-
     /// Color values are out of valid range
     InvalidColorValue {
         component:   String,
         value:       f64,
         valid_range: (f64, f64),
     },
-
     /// Camera configuration is invalid
     InvalidCamera { reason: String },
-
     /// Ray casting failed
     RayCastError { reason: String },
 }
@@ -96,31 +81,21 @@ pub enum GraphicsError {
 pub enum GeometryError {
     /// No intersections found when one was expected
     NoIntersection {
-        shape_type:    String,
-        ray_origin:    [f64; 3],
-        ray_direction: [f64; 3],
+        shape:     String,
+        origin:    [f64; 3],
+        direction: [f64; 3],
     },
-
     /// Invalid shape parameters
     InvalidShape {
-        shape_type: String,
-        parameter:  String,
-        value:      String,
-        reason:     String,
+        shape:     String,
+        parameter: String,
+        value:     String,
+        reason:    String,
     },
-
     /// Transform stack overflow (too many nested transformations)
-    TransformStackOverflow {
-        current_depth: usize,
-        max_depth:     usize,
-    },
-
+    TransformStackOverflow { depth: usize, max_depth: usize },
     /// Invalid UV coordinates for texture mapping
-    InvalidUvCoordinates {
-        u:          f64,
-        v:          f64,
-        shape_type: String,
-    },
+    InvalidUvCoordinates { u: f64, v: f64, shape: String },
 }
 
 /// Material and shading errors
@@ -132,25 +107,19 @@ pub enum ShadingError {
         value:       f64,
         valid_range: (f64, f64),
     },
-
     /// Pattern generation failed
-    PatternError {
-        pattern_type: String,
-        reason:       String,
-    },
-
+    PatternError { pattern: String, reason: String },
     /// Lighting calculation failed
     LightingError {
         reason:         String,
         light_position: [f64; 3],
         surface_point:  [f64; 3],
     },
-
     /// Recursive reflection/refraction depth exceeded
     RecursionLimitExceeded {
-        current_depth: usize,
-        max_depth:     usize,
-        ray_type:      String, // "reflection" or "refraction"
+        depth:     usize,
+        max_depth: usize,
+        ray:       String, // "reflection" or "refraction"
     },
 }
 
@@ -159,19 +128,14 @@ pub enum ShadingError {
 pub enum WorldError {
     /// Scene contains no objects
     EmptyScene,
-
     /// Scene contains no lights
     NoLights,
-
     /// Too many objects in scene (performance limit)
     TooManyObjects { count: usize, max_count: usize },
-
     /// Object ID not found in scene
-    ObjectNotFound { object_id: String },
-
+    ObjectNotFound { id: String },
     /// Light ID not found in scene
-    LightNotFound { light_id: String },
-
+    LightNotFound { id: String },
     /// Scene hierarchy is invalid (circular references, etc.)
     InvalidHierarchy { reason: String },
 }
@@ -181,25 +145,22 @@ pub enum WorldError {
 pub enum IoError {
     /// File operation failed
     FileOperation {
-        operation: String,
+        operation: io::ErrorKind, // !NOTE: could be String. need to test
         filename:  String,
-        source:    std::io::Error,
+        source:    io::Error,
     },
-
     /// Image format not supported
     UnsupportedFormat {
         filename:          String,
         format:            String,
         supported_formats: Vec<String>,
     },
-
     /// File parsing failed
     ParseError {
         filename:    String,
         line_number: Option<usize>,
         reason:      String,
     },
-
     /// Network resource unavailable (for future web features)
     NetworkError { url: String, reason: String },
 }
@@ -208,24 +169,16 @@ pub enum IoError {
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConfigError {
     /// Missing required configuration
-    MissingConfig {
-        config_key:  String,
-        config_file: String,
-    },
-
+    MissingConfig { key: String, file: String },
     /// Invalid configuration value
     InvalidConfig {
-        config_key:    String,
-        value:         String,
-        expected_type: String,
+        key:      String,
+        value:    String,
+        expected: String,
     },
 
     /// Configuration file is corrupted or unreadable
-    CorruptedConfig {
-        config_file: String,
-        reason:      String,
-    },
-
+    CorruptedConfig { file: String, reason: String },
     /// Version incompatibility
     VersionMismatch {
         required_version: String,
@@ -241,14 +194,14 @@ pub enum ConfigError {
 impl fmt::Display for TracerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Math(e) => write!(f, "Math error: {}", e),
-            Self::Graphics(e) => write!(f, "Graphics error: {}", e),
-            Self::Geometry(e) => write!(f, "Geometry error: {}", e),
-            Self::Shading(e) => write!(f, "Shading error: {}", e),
-            Self::World(e) => write!(f, "World error: {}", e),
-            Self::Io(e) => write!(f, "I/O error: {}", e),
-            Self::Config(e) => write!(f, "Configuration error: {}", e),
-            Self::Other(error) => write!(f, "Error: {}", error),
+            Self::Math(e) => write!(f, "MathError: {e}",),
+            Self::Graphics(e) => write!(f, "GraphicsError: {e}",),
+            Self::Geometry(e) => write!(f, "GeometryError: {e}",),
+            Self::Shading(e) => write!(f, "ShadingError: {e}",),
+            Self::World(e) => write!(f, "WorldError: {e}",),
+            Self::Io(e) => write!(f, "I/O Error: {e}",),
+            Self::Config(e) => write!(f, "ConfigurationError: {e}",),
+            Self::Other(e) => write!(f, "Error: {e}",),
         }
     }
 }
@@ -256,39 +209,33 @@ impl fmt::Display for TracerError {
 impl fmt::Display for MathError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::DivisionByZero { operation, value } => {
-                write!(f, "Division by zero in {}: value was {}", operation, value)
+            Self::DivisionByZero { operation: op, value } => {
+                write!(f, "Division by zero in {op}: value was {value}")
             },
-            Self::MatrixNotInvertible { matrix_type } => {
-                write!(
-                    f,
-                    "{} matrix is not invertible (determinant is zero)",
-                    matrix_type
-                )
+            Self::MatrixNotInvertible { matrix } => {
+                write!(f, "{matrix} matrix is not invertible (determinant is zero)",)
             },
-            Self::InvalidVector { operation, vector } => {
-                write!(
-                    f,
-                    "Invalid vector for {}: ({}, {}, {})",
-                    operation, vector[0], vector[1], vector[2]
-                )
+            Self::InvalidVector {
+                operation: op,
+                vector: [x, y, z],
+            } => {
+                write!(f, "Invalid vector for {op}: ({x}, {y}, {z})",)
             },
             Self::InvalidTransform {
                 transform_type,
                 reason,
             } => {
-                write!(f, "Invalid {} transformation: {}", transform_type, reason)
+                write!(f, "Invalid {transform_type} transformation: {reason}")
             },
             Self::PrecisionError {
-                operation,
+                operation: op,
                 expected,
                 actual,
                 epsilon,
             } => {
                 write!(
                     f,
-                    "Precision error in {}: expected {}, got {} (ε={})",
-                    operation, expected, actual, epsilon
+                    "Precision error in {op}: expected {expected}, got {actual} (ε={epsilon})",
                 )
             },
         }
@@ -299,39 +246,35 @@ impl fmt::Display for GraphicsError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidDimensions {
-                width,
-                height,
-                max_size,
+                width: w,
+                height: h,
+                max_size: size,
             } => {
-                write!(
-                    f,
-                    "Invalid canvas dimensions: {}x{} (max size: {})",
-                    width, height, max_size
-                )
+                write!(f, "Invalid canvas dimensions: {w}x{h} (max size: {size})",)
             },
-            Self::PixelOutOfBounds { x, y, width, height } => {
-                write!(
-                    f,
-                    "Pixel ({}, {}) is out of bounds for {}x{} canvas",
-                    x, y, width, height
-                )
+            Self::PixelOutOfBounds {
+                x,
+                y,
+                width: w,
+                height: h,
+            } => {
+                write!(f, "Pixel ({x}, {y}) is out of bounds for {w}x{h} canvas",)
             },
             Self::InvalidColorValue {
                 component,
                 value,
-                valid_range,
+                valid_range: (a, b),
             } => {
                 write!(
                     f,
-                    "Invalid color {}: {} (valid range: {:.2} to {:.2})",
-                    component, value, valid_range.0, valid_range.1
+                    "Invalid color {component}: {value} (valid range: {a:.2} to {b:.2})",
                 )
             },
             Self::InvalidCamera { reason } => {
-                write!(f, "Invalid camera configuration: {}", reason)
+                write!(f, "Invalid camera configuration: {reason}")
             },
             Self::RayCastError { reason } => {
-                write!(f, "Ray casting failed: {}", reason)
+                write!(f, "Ray casting failed: {reason}")
             },
         }
     }
@@ -341,42 +284,29 @@ impl fmt::Display for GeometryError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NoIntersection {
-                shape_type,
-                ray_origin,
-                ray_direction,
+                shape,
+                origin: [x, y, z],
+                direction: [a, b, c],
             } => {
                 write!(
                     f,
-                    "No intersection with {} (ray: origin=({:.2}, {:.2}, {:.2}), dir=({:.2}, {:.2}, \
-                     {:.2}))",
-                    shape_type,
-                    ray_origin[0],
-                    ray_origin[1],
-                    ray_origin[2],
-                    ray_direction[0],
-                    ray_direction[1],
-                    ray_direction[2]
+                    "No intersection with {shape} (ray: origin=({x:.2}, {y:.2}, {z:.2}), \
+                     direction=({a:.2}, {b:.2}, {c:.2}))",
                 )
             },
             Self::InvalidShape {
-                shape_type,
+                shape,
                 parameter,
                 value,
                 reason,
             } => {
-                write!(f, "Invalid {} {}: {} ({})", shape_type, parameter, value, reason)
+                write!(f, "Invalid {shape} {parameter}: {value} ({reason})")
             },
-            Self::TransformStackOverflow {
-                current_depth,
-                max_depth,
-            } => {
-                write!(
-                    f,
-                    "Transform stack overflow: {current_depth} levels (max: {max_depth})",
-                )
+            Self::TransformStackOverflow { depth, max_depth } => {
+                write!(f, "Transform stack overflow: {depth} levels (max: {max_depth})",)
             },
-            Self::InvalidUvCoordinates { u, v, shape_type } => {
-                write!(f, "Invalid UV coordinates ({}, {}) for {}", u, v, shape_type)
+            Self::InvalidUvCoordinates { u, v, shape } => {
+                write!(f, "Invalid UV coordinates ({u}, {v}) for {shape}")
             },
         }
     }
@@ -388,44 +318,35 @@ impl fmt::Display for ShadingError {
             Self::InvalidMaterial {
                 property,
                 value,
-                valid_range,
+                valid_range: (a, b),
             } => {
                 write!(
                     f,
-                    "Invalid material {}: {} (valid range: {:.2} to {:.2})",
-                    property, value, valid_range.0, valid_range.1
+                    "Invalid material {property}: {value} (valid range: {a:.2} to {b:.2})",
                 )
             },
-            Self::PatternError { pattern_type, reason } => {
-                write!(f, "Pattern generation failed for {}: {}", pattern_type, reason)
+            Self::PatternError { pattern, reason } => {
+                write!(f, "Pattern generation failed for {pattern}: {reason}")
             },
             Self::LightingError {
                 reason,
-                light_position,
-                surface_point,
+                light_position: [a, b, c],
+                surface_point: [x, y, z],
             } => {
                 write!(
                     f,
-                    "Lighting calculation failed: {} (light: ({:.2}, {:.2}, {:.2}), surface: ({:.2}, \
-                     {:.2}, {:.2}))",
-                    reason,
-                    light_position[0],
-                    light_position[1],
-                    light_position[2],
-                    surface_point[0],
-                    surface_point[1],
-                    surface_point[2]
+                    "Lighting calculation failed: {reason} (light: ({a:.2}, {b:.2}, {c:.2}),
+                    surface: ({x:.2}, {y:.2}, {z:.2}))",
                 )
             },
             Self::RecursionLimitExceeded {
-                current_depth,
+                depth,
                 max_depth,
-                ray_type,
+                ray,
             } => {
                 write!(
                     f,
-                    "Recursion limit exceeded for {}: {} levels (max: {})",
-                    ray_type, current_depth, max_depth
+                    "Recursion limit exceeded for {ray}: {depth} levels (max: {max_depth})",
                 )
             },
         }
@@ -438,16 +359,16 @@ impl fmt::Display for WorldError {
             Self::EmptyScene => write!(f, "Scene contains no objects to render"),
             Self::NoLights => write!(f, "Scene contains no lights"),
             Self::TooManyObjects { count, max_count } => {
-                write!(f, "Too many objects in scene: {} (max: {})", count, max_count)
+                write!(f, "Too many objects in scene: {count} (max: {max_count})")
             },
-            Self::ObjectNotFound { object_id } => {
-                write!(f, "Object not found: {}", object_id)
+            Self::ObjectNotFound { id } => {
+                write!(f, "Object not found: {id}",)
             },
-            Self::LightNotFound { light_id } => {
-                write!(f, "Light not found: {}", light_id)
+            Self::LightNotFound { id } => {
+                write!(f, "Light not found: {id}")
             },
             Self::InvalidHierarchy { reason } => {
-                write!(f, "Invalid scene hierarchy: {}", reason)
+                write!(f, "Invalid scene hierarchy: {reason}")
             },
         }
     }
@@ -461,7 +382,7 @@ impl fmt::Display for IoError {
                 filename,
                 source,
             } => {
-                write!(f, "Failed to {} file '{}': {}", operation, filename, source)
+                write!(f, "Failed to {operation} file '{filename}': {source}")
             },
             Self::UnsupportedFormat {
                 filename,
@@ -470,9 +391,7 @@ impl fmt::Display for IoError {
             } => {
                 write!(
                     f,
-                    "Unsupported format '{}' for file '{}'. Supported: {}",
-                    format,
-                    filename,
+                    "Unsupported format '{format}' for file '{filename}'. Supported: {}",
                     supported_formats.join(", ")
                 )
             },
@@ -494,39 +413,26 @@ impl fmt::Display for IoError {
 impl fmt::Display for ConfigError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::MissingConfig {
-                config_key,
-                config_file,
-            } => {
+            Self::MissingConfig { key, file } => {
+                write!(f, "Missing configuration '{key}' in file '{file}'",)
+            },
+            Self::InvalidConfig { key, value, expected } => {
                 write!(
                     f,
-                    "Missing configuration '{}' in file '{}'",
-                    config_key, config_file
+                    "Invalid configuration '{key}': got '{value}', expected {expected}",
                 )
             },
-            Self::InvalidConfig {
-                config_key,
-                value,
-                expected_type,
-            } => {
-                write!(
-                    f,
-                    "Invalid configuration '{}': got '{}', expected {}",
-                    config_key, value, expected_type
-                )
-            },
-            Self::CorruptedConfig { config_file, reason } => {
-                write!(f, "Corrupted configuration file '{}': {}", config_file, reason)
+            Self::CorruptedConfig { file, reason } => {
+                write!(f, "Corrupted configuration file '{file}': {reason}")
             },
             Self::VersionMismatch {
+                component,
                 required_version,
                 found_version,
-                component,
             } => {
                 write!(
                     f,
-                    "Version mismatch for {}: required {}, found {}",
-                    component, required_version, found_version
+                    "Version mismatch for {component}: required {required_version}, found {found_version}",
                 )
             },
         }
@@ -544,10 +450,10 @@ impl Error for WorldError {}
 impl Error for IoError {}
 impl Error for ConfigError {}
 
-impl From<std::io::Error> for TracerError {
-    fn from(error: std::io::Error) -> Self {
-        TracerError::Io(IoError::FileOperation {
-            operation: "unknown".to_string(),
+impl From<io::Error> for TracerError {
+    fn from(error: io::Error) -> Self {
+        Self::Io(IoError::FileOperation {
+            operation: error.kind(),
             filename:  "unknown".to_string(),
             source:    error,
         })
