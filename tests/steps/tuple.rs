@@ -5,7 +5,7 @@ use crate::support::helpers::tuple::{Tuple4, get_as_tuple};
 use crate::support::world::TestWorld;
 
 // ===============================================================================
-// Givens
+// Given Steps - Tuple, Vector, Point, Color Construction
 // ===============================================================================
 #[given(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([^)]+)\)$"
@@ -38,7 +38,7 @@ fn given_vector_sqrt2_half(world: &mut TestWorld, name: String) {
 }
 
 // ===============================================================================
-// Whens
+// When Steps -
 // ===============================================================================
 #[when(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← normalize\(([a-zA-Z_][a-zA-Z0-9_]*)\)$")]
 fn when_normalize(world: &mut TestWorld, result: String, vector: String) {
@@ -58,16 +58,16 @@ fn when_reflect(world: &mut TestWorld, result: String, vector: String, normal: S
 }
 
 // ===============================================================================
-// Thens - Properties
+// Then Steps - Tuple Properties
 // ===============================================================================
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.x = ([-+]?\d*\.?\d+)$")]
 fn then_x_equals(world: &mut TestWorld, name: String, expected: f64) {
     if let Some(tuple) = world.get::<Tuple4>(&name) {
-        assert!((tuple.x() == expected));
+        assert!(is_equal(tuple.x(), expected));
     } else if let Some(point) = world.get::<Point3>(&name) {
-        assert!((point.x() == expected));
+        assert!(is_equal(point.x(), expected));
     } else if let Some(vector) = world.get::<Vec3>(&name) {
-        assert!((vector.x() == expected));
+        assert!(is_equal(vector.x(), expected));
     } else {
         panic!("Variable {} not found", name);
     }
@@ -75,11 +75,11 @@ fn then_x_equals(world: &mut TestWorld, name: String, expected: f64) {
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.y = ([-+]?\d*\.?\d+)$")]
 fn then_y_equals(world: &mut TestWorld, name: String, expected: f64) {
     if let Some(tuple) = world.get::<Tuple4>(&name) {
-        assert!((tuple.y() == expected));
+        assert!(is_equal(tuple.y(), expected));
     } else if let Some(point) = world.get::<Point3>(&name) {
-        assert!((point.y() == expected));
+        assert!(is_equal(point.y(), expected));
     } else if let Some(vector) = world.get::<Vec3>(&name) {
-        assert!((vector.y() == expected));
+        assert!(is_equal(vector.y(), expected));
     } else {
         panic!("Variable {} not found", name);
     }
@@ -87,11 +87,11 @@ fn then_y_equals(world: &mut TestWorld, name: String, expected: f64) {
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.z = ([-+]?\d*\.?\d+)$")]
 fn then_z_equals(world: &mut TestWorld, name: String, expected: f64) {
     if let Some(tuple) = world.get::<Tuple4>(&name) {
-        assert!((tuple.z() == expected));
+        assert!(is_equal(tuple.z(), expected));
     } else if let Some(point) = world.get::<Point3>(&name) {
-        assert!((point.z() == expected));
+        assert!(is_equal(point.z(), expected));
     } else if let Some(vector) = world.get::<Vec3>(&name) {
-        assert!((vector.z() == expected));
+        assert!(is_equal(vector.z(), expected));
     } else {
         panic!("Variable {} not found", name);
     }
@@ -99,11 +99,11 @@ fn then_z_equals(world: &mut TestWorld, name: String, expected: f64) {
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.w = ([-+]?\d*\.?\d+)$")]
 fn then_w_equals(world: &mut TestWorld, name: String, expected: f64) {
     if let Some(tuple) = world.get::<Tuple4>(&name) {
-        assert!((tuple.w() == expected));
+        assert!(is_equal(tuple.w(), expected));
     } else if world.get::<Point3>(&name).is_some() {
-        assert!((1.0 == expected));
+        assert!(is_equal(1.0, expected));
     } else if world.get::<Vec3>(&name).is_some() {
-        assert!((0.0 == expected));
+        assert!(is_equal(0.0, expected));
     } else {
         panic!("Variable {} not found", name);
     }
@@ -114,7 +114,7 @@ fn then_red_equals(world: &mut TestWorld, name: String, expected: f64) {
     let color = world
         .get::<Color>(&name)
         .unwrap_or_else(|| panic!("Color {name} not found"));
-    assert!((color.r() == expected));
+    assert!(is_equal(color.r(), expected));
 }
 
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.green = ([-+]?\d*\.?\d+)$")]
@@ -122,7 +122,7 @@ fn then_green_equals(world: &mut TestWorld, name: String, expected: f64) {
     let color = world
         .get::<Color>(&name)
         .unwrap_or_else(|| panic!("Color {name} not found"));
-    assert!((color.g() == expected));
+    assert!(is_equal(color.g(), expected));
 }
 
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.blue = ([-+]?\d*\.?\d+)$")]
@@ -130,11 +130,11 @@ fn then_blue_equals(world: &mut TestWorld, name: String, expected: f64) {
     let color = world
         .get::<Color>(&name)
         .unwrap_or_else(|| panic!("Color {name} not found"));
-    assert!((color.b() == expected));
+    assert!(is_equal(color.b(), expected));
 }
 
 // ===============================================================================
-// Thens - Type Checks
+// Then Steps - Tuple Type Checking
 // ===============================================================================
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is a point$")]
 fn then_is_point(world: &mut TestWorld, name: String) {
@@ -169,7 +169,7 @@ fn then_is_not_vector(world: &mut TestWorld, name: String) {
 }
 
 // ===============================================================================
-// Thens - Equality
+// Then Steps - Equality
 // ===============================================================================
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
@@ -180,11 +180,11 @@ fn then_equals_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64
     if let Some(tuple) = world.get::<Tuple4>(&name) {
         assert_eq!(*tuple, expected);
     } else if let Some(point) = world.get::<Point3>(&name) {
-        let point_as_tuple = Tuple4::new(point.x(), point.y(), point.z(), 1.0);
-        assert_eq!(point_as_tuple, expected);
+        let tuple = Tuple4::new(point.x(), point.y(), point.z(), 1.0);
+        assert_eq!(tuple, expected);
     } else if let Some(vector) = world.get::<Vec3>(&name) {
-        let vector_as_tuple = Tuple4::new(vector.x(), vector.y(), vector.z(), 0.0);
-        assert_eq!(vector_as_tuple, expected);
+        let tuple = Tuple4::new(vector.x(), vector.y(), vector.z(), 0.0);
+        assert_eq!(tuple, expected);
     } else {
         panic!("Variable {} not found", name);
     }
@@ -232,7 +232,7 @@ fn then_equals_color(world: &mut TestWorld, name: String, r: f64, g: f64, b: f64
 }
 
 // ===============================================================================
-// Thens - Operations
+// Then Steps - Operations
 // ===============================================================================
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \+ ([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
@@ -388,8 +388,9 @@ fn then_div_equals_tuple(
     w: f64,
 ) {
     let t = get_as_tuple(world, &name);
+    let inverse = 1.0 / divisor;
 
-    let result = Tuple4::new(t.x() / divisor, t.y() / divisor, t.z() / divisor, t.w() / divisor);
+    let result = Tuple4::new(t.x() * inverse, t.y() * inverse, t.z() * inverse, t.w() * inverse);
     let expected = Tuple4::new(x, y, z, w);
     assert_eq!(result, expected);
 }
@@ -447,6 +448,7 @@ fn then_dot_equals(world: &mut TestWorld, a: String, b: String, expected: f64) {
     let vector_b = world
         .get::<Vec3>(&b)
         .unwrap_or_else(|| panic!("Vector {} not found", b));
+    // ? should I be using the bitxor sign for dot ops on vector?
     let result = *vector_a ^ *vector_b;
     assert_eq!(result, expected);
 }
@@ -462,6 +464,7 @@ fn then_cross_equals_vector(world: &mut TestWorld, a: String, b: String, x: f64,
         .get::<Vec3>(&b)
         .unwrap_or_else(|| panic!("Vector {} not found", b));
 
+    // ? should I be using the mul sign for cross ops on vector?
     let result = *vector_a * *vector_b;
     let expected = Vec3::new(x, y, z);
     assert_eq!(result, expected);

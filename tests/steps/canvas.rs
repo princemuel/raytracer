@@ -5,7 +5,7 @@ use raytracer::prelude::*;
 use crate::support::world::TestWorld;
 
 // ===============================================================================
-// Givens
+// Given Steps - Canvas Construction
 // ===============================================================================
 #[given(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← canvas\(([-+]?\d+), ([-+]?\d+)\)$")]
 fn given_canvas(world: &mut TestWorld, name: String, width: usize, height: usize) {
@@ -13,7 +13,7 @@ fn given_canvas(world: &mut TestWorld, name: String, width: usize, height: usize
 }
 
 // ===============================================================================
-// Whens
+// When Steps -
 // ===============================================================================
 #[when(
     regex = r"^write_pixel\(([a-zA-Z_][a-zA-Z0-9_]*), ([-+]?\d+), ([-+]?\d+), ([a-zA-Z_][a-zA-Z0-9_]*)\)$"
@@ -48,7 +48,7 @@ fn when_pixel_is_color(world: &mut TestWorld, name: String, r: f64, g: f64, b: f
 }
 
 // ===============================================================================
-// Thens - Properties
+// Then Steps - Canvas Properties
 // ===============================================================================
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.width = ([-+]?\d+)$")]
 fn then_width_equals(world: &mut TestWorld, name: String, expected: usize) {
@@ -67,7 +67,7 @@ fn then_height_equals(world: &mut TestWorld, name: String, expected: usize) {
 }
 
 // ===============================================================================
-// Thens - Equality
+// Then Steps - Canvas Equality
 // ===============================================================================
 #[then(
     regex = r"^pixel_at\(([a-zA-Z_][a-zA-Z0-9_]*), ([-+]?\d+), ([-+]?\d+)\) = ([a-zA-Z_][a-zA-Z0-9_]*)$"

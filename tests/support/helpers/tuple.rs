@@ -16,9 +16,9 @@ impl Tuple4 {
 
     pub fn w(&self) -> f64 { self.3 }
 
-    pub fn is_point(&self) -> bool { (self.3 - 1.0).abs() < EPSILON }
+    pub fn is_point(&self) -> bool { is_equal(self.3, 1.0) }
 
-    pub fn is_vector(&self) -> bool { self.3.abs() < EPSILON }
+    pub fn is_vector(&self) -> bool { is_equal(self.3, 0.0) }
 }
 
 pub fn get_as_tuple(world: &TestWorld, name: &str) -> Tuple4 {
