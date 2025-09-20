@@ -1,7 +1,8 @@
 use core::ops::{Add, Sub};
 
 use crate::cmp::float::is_equal;
-use crate::primitives::tuple::Tuple;
+use crate::primitives::components::Tuple;
+use crate::primitives::tuple::Tuple4;
 use crate::primitives::vector::Vec3;
 
 /// Create a 3D point
@@ -71,8 +72,19 @@ impl From<Point3> for [f64; 4] {
     fn from(p: Point3) -> Self { [p.0, p.1, p.2, 1.0] }
 }
 
+impl TryFrom<&Tuple4> for Point3 {
+    type Error = &'static str;
+
+    fn try_from(t: &Tuple4) -> Result<Self, Self::Error> {
+        if !is_equal(t.w(), 1.0) {
+            return Err("Invalid w component for Point3");
+        }
+        Ok(Self(t.x(), t.y(), t.z()))
+    }
+}
+
 impl core::fmt::Display for Point3 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "Point3({:.3}, {:.3}, {:.3})", self.x(), self.y(), self.z())
+        write!(f, "Point3({:.3}, {:.3}, {:.3})", self.0, self.1, self.2)
     }
 }

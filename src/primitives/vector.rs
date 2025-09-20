@@ -2,7 +2,8 @@ use core::ops::{Add, BitXor, Div, Mul, Neg, Sub};
 
 use crate::cmp::epsilon::EPSILON;
 use crate::cmp::float::is_equal;
-use crate::primitives::tuple::Tuple;
+use crate::prelude::Tuple4;
+use crate::primitives::components::Tuple;
 
 /// Create a 3D vector
 #[inline]
@@ -36,11 +37,12 @@ impl Vec3 {
 }
 
 impl Vec3 {
-    /// Calculate magnitude (length) of vector
+    /// The magnitude (length) of vector.
+    /// It means the distance from one end of the vector to the other.
     #[inline]
     pub fn magnitude(&self) -> f64 { f64::sqrt(self.0 * self.0 + self.1 * self.1 + self.2 * self.2) }
 
-    /// Calculate squared magnitude (avoids sqrt for comparisons)
+    /// The squared magnitude (avoids sqrt for comparisons)
     #[inline]
     pub fn magnitude_sqrd(&self) -> f64 { self.0 * self.0 + self.1 * self.1 + self.2 * self.2 }
 
@@ -124,7 +126,9 @@ impl Neg for Vec3 {
     fn neg(self) -> Self::Output { Self::new(-self.0, -self.1, -self.2) }
 }
 
-// "Dot" product (or "scalar" product)
+/// "Dot" product ("scalar" or "inner" product) is the sum of the products of
+/// the corresponding components of each vector. It takes two products and
+/// returns a scalar value
 impl BitXor for Vec3 {
     type Output = f64;
 
@@ -168,6 +172,17 @@ impl Div<f64> for Vec3 {
 
 impl From<Vec3> for [f64; 4] {
     fn from(v: Vec3) -> Self { [v.0, v.1, v.2, 0.0] }
+}
+
+impl TryFrom<&Tuple4> for Vec3 {
+    type Error = &'static str;
+
+    fn try_from(t: &Tuple4) -> Result<Self, Self::Error> {
+        if !is_equal(t.w(), 0.0) {
+            return Err("Invalid w component for Vec3");
+        }
+        Ok(Self(t.x(), t.y(), t.z()))
+    }
 }
 
 impl core::fmt::Display for Vec3 {

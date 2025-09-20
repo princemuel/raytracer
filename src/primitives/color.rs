@@ -1,7 +1,7 @@
 use core::ops::{Add, Mul, Sub};
 
 use crate::cmp::float::is_equal;
-use crate::primitives::tuple::ColorRGB;
+use crate::primitives::components::ColorRGB;
 
 /// Creates a color
 #[inline]
