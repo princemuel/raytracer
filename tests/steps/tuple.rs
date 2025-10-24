@@ -45,7 +45,7 @@ fn when_normalize(world: &mut TestWorld, key: String, name: String) {
     let v = world.get::<Tuple4>(&name).unwrap();
     let v = Vec3::try_from(v).unwrap();
 
-    let value = v.normalize().unwrap();
+    let value = v.try_normalize().unwrap();
     world.insert(&key, Tuple4::from(value));
 }
 
@@ -184,7 +184,7 @@ fn then_add_equals_tuple(world: &mut TestWorld, a: String, b: String, x: f64, y:
     let a = world.get::<Tuple4>(&a).unwrap();
     let b = world.get::<Tuple4>(&b).unwrap();
 
-    let actual = *a + *b;
+    let actual = a + b;
     let expected = tuple(x, y, z, w);
     assert_eq!(actual, expected);
 }
@@ -208,7 +208,7 @@ fn then_sub_equals_vector(world: &mut TestWorld, a: String, b: String, x: f64, y
     let a = world.get::<Tuple4>(&a).unwrap();
     let b = world.get::<Tuple4>(&b).unwrap();
 
-    let actual = *a - *b;
+    let actual = a - b;
     let expected = Tuple4::from(vector(x, y, z));
     assert_eq!(actual, expected);
 }
@@ -220,7 +220,7 @@ fn then_sub_equals_point(world: &mut TestWorld, a: String, b: String, x: f64, y:
     let a = world.get::<Tuple4>(&a).unwrap();
     let b = world.get::<Tuple4>(&b).unwrap();
 
-    let actual = *a - *b;
+    let actual = a - b;
     let expected = Tuple4::from(point(x, y, z));
     assert_eq!(actual, expected);
 }
@@ -243,7 +243,7 @@ fn then_sub_equals_color(world: &mut TestWorld, ca: String, cb: String, r: f64, 
 fn then_neg_equals_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64, w: f64) {
     let t1 = world.get::<Tuple4>(&name).unwrap();
 
-    let actual = -*t1; // dereference, then neg
+    let actual = -t1;
     let expected = tuple(x, y, z, w);
     assert_eq!(actual, expected);
 }
@@ -262,7 +262,7 @@ fn then_mul_scalar_equals_tuple(
 ) {
     let t1 = world.get::<Tuple4>(&name).unwrap();
 
-    let actual = *t1 * scalar;
+    let actual = t1 * scalar;
     let expected = tuple(x, y, z, w);
     assert_eq!(actual, expected);
 }
@@ -304,7 +304,7 @@ fn then_div_equals_tuple(
 ) {
     let t1 = world.get::<Tuple4>(&name).unwrap();
 
-    let actual = *t1 / divisor;
+    let actual = t1 / divisor;
     let expected = tuple(x, y, z, w);
     assert_eq!(actual, expected);
 }
@@ -315,7 +315,7 @@ fn then_magnitude_equals(world: &mut TestWorld, name: String, expected: f64) {
     let v = world.get::<Tuple4>(&name).unwrap();
     let v = Vec3::try_from(v).unwrap();
 
-    let actual = v.magnitude();
+    let actual = v.length();
     assert_eq!(actual, expected);
 }
 
@@ -324,7 +324,7 @@ fn then_magnitude_equals_sqrt(world: &mut TestWorld, name: String, value: f64) {
     let v = world.get::<Tuple4>(&name).unwrap();
     let v = Vec3::try_from(v).unwrap();
 
-    let actual = v.magnitude();
+    let actual = v.length();
     let expected = value.sqrt();
     assert_eq!(actual, expected);
 }
@@ -337,7 +337,7 @@ fn then_normalize_equals_vector(world: &mut TestWorld, name: String, x: f64, y: 
     let v = world.get::<Tuple4>(&name).unwrap();
     let v = Vec3::try_from(v).unwrap();
 
-    let actual = v.normalize().expect("Cannot normalize zero vector");
+    let actual = v.try_normalize().expect("Cannot normalize zero vector");
     let expected = vector(x, y, z);
     assert_eq!(actual, expected);
 }
@@ -349,7 +349,7 @@ fn then_normalize_approximately_equals_vector(world: &mut TestWorld, name: Strin
     let v = world.get::<Tuple4>(&name).unwrap();
     let v = Vec3::try_from(v).unwrap();
 
-    let actual = v.normalize().expect("Cannot normalize zero vector");
+    let actual = v.try_normalize().expect("Cannot normalize zero vector");
     let expected = vector(x, y, z);
     assert_eq!(actual, expected);
 }
@@ -361,8 +361,7 @@ fn then_dot_equals(world: &mut TestWorld, a: String, b: String, expected: f64) {
     let v2 = world.get::<Tuple4>(&b).unwrap();
     let v2 = Vec3::try_from(v2).unwrap();
 
-    // ? should I be using the bitxor sign for dot ops on vector?
-    let actual = v1 ^ v2;
+    let actual = v1.dot(v2);
     assert_eq!(actual, expected);
 }
 
@@ -375,8 +374,7 @@ fn then_cross_equals_vector(world: &mut TestWorld, a: String, b: String, x: f64,
     let v2 = world.get::<Tuple4>(&b).unwrap();
     let v2 = Vec3::try_from(v2).unwrap();
 
-    // ? should I be using the mul sign for cross ops on vector?
-    let actual = v1 * v2;
+    let actual = v1.cross(v2);
     let expected = vector(x, y, z);
     assert_eq!(actual, expected);
 }
