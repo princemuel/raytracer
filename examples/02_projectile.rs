@@ -6,9 +6,10 @@ fn main() -> io::Result<()> {
     fs::create_dir_all("output")?;
 
     let mut canvas = Canvas::new(900usize, 550usize);
+
     let mut p = Projectile {
+        velocity: vector(1, 1.8, 0).normalize_or_zero() * 11.25,
         position: point(0, 1, 0),
-        velocity: unsafe { vector(1, 1.8, 0).normalize_unchecked() * 11.25 },
     };
 
     let color = Color3::red();

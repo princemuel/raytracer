@@ -14,7 +14,7 @@ fn main() -> io::Result<()> {
     let mut buffer = BufWriter::new(file);
 
     let mut p = Projectile {
-        velocity: unsafe { vector(1, 1, 0).normalize_unchecked() },
+        velocity: vector(1, 1, 0).normalize_or_zero(),
         position: point(0, 1, 0),
     };
     let e = Environment {
