@@ -169,10 +169,7 @@ impl TryFrom<&Tuple4> for Point3 {
 
 impl core::fmt::Display for Point3 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        if let Some(p) = f.precision() {
-            write!(f, "[{:.*}, {:.*}, {:.*}]", p, self.x(), p, self.y(), p, self.z())
-        } else {
-            write!(f, "[{}, {}, {}]", self.x(), self.y(), self.z())
-        }
+        let p = f.precision().unwrap_or(3);
+        write!(f, "[{:.*}, {:.*}, {:.*}]", p, self.x(), p, self.y(), p, self.z())
     }
 }

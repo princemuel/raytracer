@@ -1,7 +1,6 @@
 use core::ops::{Add, Mul, Sub};
 
 use crate::cmp::float::is_equal;
-use crate::primitives::components::ColorRGB;
 
 /// Creates a color
 #[inline]
@@ -36,14 +35,15 @@ impl Color3 {
 
     #[inline]
     pub const fn blue() -> Self { Self::new(0.0, 0.0, 1.0) }
-}
 
-impl ColorRGB for Color3 {
-    fn r(&self) -> f64 { self.0 }
+    #[inline]
+    pub const fn r(&self) -> f64 { self.0 }
 
-    fn g(&self) -> f64 { self.1 }
+    #[inline]
+    pub const fn g(&self) -> f64 { self.1 }
 
-    fn b(&self) -> f64 { self.2 }
+    #[inline]
+    pub const fn b(&self) -> f64 { self.2 }
 }
 
 impl PartialEq for Color3 {
@@ -119,7 +119,8 @@ impl From<Color3> for [u8; 3] {
 
 impl core::fmt::Display for Color3 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "Color3({:.3}, {:.3}, {:.3})", self.r(), self.g(), self.b())
+        let p = f.precision().unwrap_or(3);
+        write!(f, "[{:.*}, {:.*}, {:.*}]", p, self.r(), p, self.g(), p, self.b())
     }
 }
 
