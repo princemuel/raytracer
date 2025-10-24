@@ -41,13 +41,13 @@ fn tick(mut p: Projectile, e: Environment) -> Projectile {
     p
 }
 
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug, Default)]
 struct Projectile {
     position: Point,
     velocity: Vector,
 }
 
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug, Default)]
 struct Environment {
     gravity: Vector,
     wind:    Vector,

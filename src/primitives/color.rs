@@ -15,7 +15,7 @@ where
 }
 
 /// RGB Color with floating-point components
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Color3(f64, f64, f64);
 
 impl Color3 {
@@ -126,6 +126,34 @@ impl core::fmt::Display for Color3 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_color_constructor() {
+        let c1 = color(-0.5, 0.4, 1.7);
+
+        assert_eq!(c1.r(), -0.5);
+        assert_eq!(c1.g(), 0.4);
+        assert_eq!(c1.b(), 1.7);
+    }
+
+    #[test]
+    fn test_can_be_muliplied_by_a_scalar() {
+        let c1 = color(0.2, 0.3, 0.4);
+
+        let actual = c1 * 2.0;
+        let expected = color(0.4, 0.6, 0.8);
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_can_be_muliplied_with_each_other() {
+        let c1 = color(1.0, 0.2, 0.4);
+        let c2 = color(0.9, 1.0, 0.2);
+
+        let actual = c1 * c2;
+        let expected = color(0.9, 0.2, 0.08);
+        assert_eq!(actual, expected);
+    }
 
     #[test]
     fn test_round_trip_rgb_conversion() {

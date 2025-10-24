@@ -3,7 +3,7 @@ use core::ops::{Index, IndexMut};
 use crate::primitives::Color3;
 
 /// A 2D canvas storing colors for ray tracing.
-#[derive(Default, Debug, Clone, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Canvas {
     width:  usize,
     height: usize,
@@ -13,8 +13,11 @@ pub struct Canvas {
 impl Canvas {
     /// Creates a new canvas filled with default colors (black).
     pub fn new(width: usize, height: usize) -> Self {
-        #[rustfmt::skip]
-        Self { width, height, pixels: vec![Color3::black(); width * height] }
+        Self {
+            width,
+            height,
+            pixels: vec![Color3::black(); width * height],
+        }
     }
 
     /// Returns the canvas width.

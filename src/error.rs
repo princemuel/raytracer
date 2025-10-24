@@ -26,7 +26,7 @@ pub enum TracerError {
 }
 
 /// Mathematical operation errors
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum MathError {
     /// Division by zero or near-zero value
     DivisionByZero { operation: String, value: f64 },
@@ -49,7 +49,7 @@ pub enum MathError {
 }
 
 /// Canvas and rendering errors
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum GraphicsError {
     /// Canvas dimensions are invalid
     InvalidDimensions {
@@ -77,7 +77,7 @@ pub enum GraphicsError {
 }
 
 /// Geometry and intersection errors
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum GeometryError {
     /// No intersections found when one was expected
     NoIntersection {
@@ -99,7 +99,7 @@ pub enum GeometryError {
 }
 
 /// Material and shading errors
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ShadingError {
     /// Invalid material property
     InvalidMaterial {
@@ -124,7 +124,7 @@ pub enum ShadingError {
 }
 
 /// Scene and world management errors
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum WorldError {
     /// Scene contains no objects
     EmptyScene,
@@ -166,7 +166,7 @@ pub enum IoError {
 }
 
 /// Configuration and setup errors
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ConfigError {
     /// Missing required configuration
     MissingConfig { key: String, file: String },
