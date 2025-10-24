@@ -3,7 +3,7 @@
 # https://rust-lang.github.io/rust-clippy/master/index.html
 
 # Minimum Supported Rust Version (conservative for WASM tooling)
-msrv = "1.87"
+msrv = "1.90"
 # Complexity thresholds (stricter for WASM due to size concerns)
 cognitive-complexity-threshold = 18
 too-many-arguments-threshold = 12
