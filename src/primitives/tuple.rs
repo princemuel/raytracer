@@ -92,7 +92,7 @@ impl PartialEq for Tuple4 {
     }
 }
 
-macro_rules! impl_struct_ops {
+macro_rules! impl_ops {
     ($Struct:ident, $t:ty, $Trait:ident, $func:ident, $op:tt) => {
         impl $Trait for $Struct {
             type Output = Self;
@@ -125,11 +125,7 @@ macro_rules! impl_struct_ops {
                 (*self).$func(rhs)
             }
         }
-    };
-}
 
-macro_rules! impl_scalar_ops {
-    ($Struct:ident, $t:ty, $Trait:ident, $func:ident, $op:tt) => {
         impl $Trait<$t> for $Struct {
             type Output = Self;
             #[inline]
@@ -164,17 +160,10 @@ macro_rules! impl_scalar_ops {
     };
 }
 
-impl_struct_ops!(Tuple4, f64, Mul, mul, *);
-impl_scalar_ops!(Tuple4, f64, Mul, mul, *);
-
-impl_struct_ops!(Tuple4, f64, Add, add, +);
-impl_scalar_ops!(Tuple4, f64, Add, add, +);
-
-impl_struct_ops!(Tuple4, f64, Div, div, /);
-impl_scalar_ops!(Tuple4, f64, Div, div, /);
-
-impl_struct_ops!(Tuple4, f64, Sub, sub, -);
-impl_scalar_ops!(Tuple4, f64, Sub, sub, -);
+impl_ops!(Tuple4, f64, Mul, mul, *);
+impl_ops!(Tuple4, f64, Add, add, +);
+impl_ops!(Tuple4, f64, Div, div, /);
+impl_ops!(Tuple4, f64, Sub, sub, -);
 
 impl Neg for Tuple4 {
     type Output = Self;
