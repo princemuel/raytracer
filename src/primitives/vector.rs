@@ -283,7 +283,7 @@ impl PartialEq for Vec3 {
     }
 }
 
-macro_rules! impl_struct_ops {
+macro_rules! impl_ops {
     ($Struct:ident, $t:ty, $Trait:ident, $func:ident, $op:tt) => {
         impl $Trait for $Struct {
             type Output = Self;
@@ -316,11 +316,7 @@ macro_rules! impl_struct_ops {
                 (*self).$func(rhs)
             }
         }
-    };
-}
 
-macro_rules! impl_scalar_ops {
-    ($Struct:ident, $t:ty, $Trait:ident, $func:ident, $op:tt) => {
         impl $Trait<$t> for $Struct {
             type Output = Self;
             #[inline]
@@ -352,20 +348,14 @@ macro_rules! impl_scalar_ops {
                 (*self).$func(rhs)
             }
         }
+
     };
 }
 
-impl_struct_ops!(Vec3, f64, Mul, mul, *);
-impl_scalar_ops!(Vec3, f64, Mul, mul, *);
-
-impl_struct_ops!(Vec3, f64, Add, add, +);
-impl_scalar_ops!(Vec3, f64, Add, add, +);
-
-impl_struct_ops!(Vec3, f64, Div, div, /);
-impl_scalar_ops!(Vec3, f64, Div, div, /);
-
-impl_struct_ops!(Vec3, f64, Sub, sub, -);
-impl_scalar_ops!(Vec3, f64, Sub, sub, -);
+impl_ops!(Vec3, f64, Mul, mul, *);
+impl_ops!(Vec3, f64, Add, add, +);
+impl_ops!(Vec3, f64, Div, div, /);
+impl_ops!(Vec3, f64, Sub, sub, -);
 
 impl Neg for Vec3 {
     type Output = Self;
