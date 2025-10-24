@@ -59,7 +59,7 @@ fn when_reflect(world: &mut TestWorld, key: String, name: String, normal: String
     let n = world.get::<Tuple4>(&normal).unwrap();
     let n = Vec3::try_from(n).unwrap();
 
-    let value = v.reflect(&n);
+    let value = v.reflect(n);
     world.insert(&key, Tuple4::from(value));
 }
 
