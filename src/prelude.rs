@@ -29,14 +29,14 @@ pub use crate::primitives::{Color3, Point3, Vec3, Tuple4};
 
 #[rustfmt::skip]
 // Re-export fundamental traits
-pub use crate::primitives::{ColorRGB, Tuple};
+pub use crate::primitives::{ColorRGB, Tuple,};
 
 #[rustfmt::skip]
 // Re-export constructor functions
 pub use crate::primitives::{color, point, vector, tuple};
 
 // Re-export matrix and transformation types
-pub use crate::primitives::{Matrix, Matrix2, Matrix3, Matrix4};
+pub use crate::primitives::{Mat2, Mat3, Mat4, Matrix};
 
 // ================================
 // Graphics & Rendering
@@ -74,6 +74,7 @@ pub type Color = Color3;
 
 /// Convenient Result type alias
 pub type Result<T> = core::result::Result<T, TracerError>;
+
 // ================================
 // Debug & Visualization Helpers
 // ================================
