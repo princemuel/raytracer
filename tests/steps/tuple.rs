@@ -1,27 +1,27 @@
 use cucumber::{given, then, when};
 use raytracer::prelude::*;
+use raytracer::primitives::Tuple4;
 
-use crate::support::helpers::tuple::{Tuple4, get_as_tuple};
 use crate::support::world::TestWorld;
 
 // ===============================================================================
-// Givens
+// Given Steps - Tuple, Vector, Point, Color Construction
 // ===============================================================================
 #[given(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([^)]+)\)$"
 )]
 fn given_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64, w: f64) {
-    world.insert(&name, Tuple4::new(x, y, z, w));
+    world.insert(&name, tuple(x, y, z, w));
 }
 
 #[given(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← point\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([^)]+)\)$")]
 fn given_point(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64) {
-    world.insert(&name, point(x, y, z));
+    world.insert(&name, Tuple4::from(point(x, y, z)));
 }
 
 #[given(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← vector\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([^)]+)\)$")]
 fn given_vector(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64) {
-    world.insert(&name, vector(x, y, z));
+    world.insert(&name, Tuple4::from(vector(x, y, z)));
 }
 
 #[given(
@@ -34,297 +34,218 @@ fn given_color(world: &mut TestWorld, name: String, r: f64, g: f64, b: f64) {
 #[given(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← vector\(√2/2, √2/2, 0\)$")]
 fn given_vector_sqrt2_half(world: &mut TestWorld, name: String) {
     let val = 2_f64.sqrt() / 2.0;
-    world.insert(&name, Vec3::new(val, val, 0.0));
+    world.insert(&name, Tuple4::from(vector(val, val, 0)));
 }
 
 // ===============================================================================
-// Whens
+// When Steps -
 // ===============================================================================
 #[when(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← normalize\(([a-zA-Z_][a-zA-Z0-9_]*)\)$")]
-fn when_normalize(world: &mut TestWorld, result: String, vector: String) {
-    let v = world.get::<Vec3>(&vector).unwrap();
-    let normalized = v.normalize().unwrap();
-    world.insert(&result, normalized);
+fn when_normalize(world: &mut TestWorld, key: String, name: String) {
+    let v = world.get::<Tuple4>(&name).unwrap();
+    let v = Vec3::try_from(v).unwrap();
+
+    let value = v.normalize().unwrap();
+    world.insert(&key, Tuple4::from(value));
 }
 
 #[when(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← reflect\(([a-zA-Z_][a-zA-Z0-9_]*), ([a-zA-Z_][a-zA-Z0-9_]*)\)$"
 )]
-fn when_reflect(world: &mut TestWorld, result: String, vector: String, normal: String) {
-    let v = world.get::<Vec3>(&vector).unwrap();
-    let n = world.get::<Vec3>(&normal).unwrap();
-    let reflected = v.reflect(*n);
-    world.insert(&result, reflected);
+fn when_reflect(world: &mut TestWorld, key: String, name: String, normal: String) {
+    let v = world.get::<Tuple4>(&name).unwrap();
+    let v = Vec3::try_from(v).unwrap();
+
+    let n = world.get::<Tuple4>(&normal).unwrap();
+    let n = Vec3::try_from(n).unwrap();
+
+    let value = v.reflect(&n);
+    world.insert(&key, Tuple4::from(value));
 }
 
 // ===============================================================================
-// Thens - Properties
+// Then Steps - Tuple Properties
 // ===============================================================================
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.x = ([-+]?\d*\.?\d+)$")]
 fn then_x_equals(world: &mut TestWorld, name: String, expected: f64) {
-    if let Some(tuple) = world.get::<Tuple4>(&name) {
-        assert!((tuple.x() == expected));
-    } else if let Some(point) = world.get::<Point3>(&name) {
-        assert!((point.x() == expected));
-    } else if let Some(vector) = world.get::<Vec3>(&name) {
-        assert!((vector.x() == expected));
-    } else {
-        panic!("Variable {} not found", name);
-    }
+    let t1 = world.get::<Tuple4>(&name).unwrap();
+    assert!(is_equal(t1.x(), expected));
 }
+
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.y = ([-+]?\d*\.?\d+)$")]
 fn then_y_equals(world: &mut TestWorld, name: String, expected: f64) {
-    if let Some(tuple) = world.get::<Tuple4>(&name) {
-        assert!((tuple.y() == expected));
-    } else if let Some(point) = world.get::<Point3>(&name) {
-        assert!((point.y() == expected));
-    } else if let Some(vector) = world.get::<Vec3>(&name) {
-        assert!((vector.y() == expected));
-    } else {
-        panic!("Variable {} not found", name);
-    }
+    let t1 = world.get::<Tuple4>(&name).unwrap();
+    assert!(is_equal(t1.y(), expected));
 }
+
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.z = ([-+]?\d*\.?\d+)$")]
 fn then_z_equals(world: &mut TestWorld, name: String, expected: f64) {
-    if let Some(tuple) = world.get::<Tuple4>(&name) {
-        assert!((tuple.z() == expected));
-    } else if let Some(point) = world.get::<Point3>(&name) {
-        assert!((point.z() == expected));
-    } else if let Some(vector) = world.get::<Vec3>(&name) {
-        assert!((vector.z() == expected));
-    } else {
-        panic!("Variable {} not found", name);
-    }
+    let t1 = world.get::<Tuple4>(&name).unwrap();
+    assert!(is_equal(t1.z(), expected));
 }
+
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.w = ([-+]?\d*\.?\d+)$")]
 fn then_w_equals(world: &mut TestWorld, name: String, expected: f64) {
-    if let Some(tuple) = world.get::<Tuple4>(&name) {
-        assert!((tuple.w() == expected));
-    } else if world.get::<Point3>(&name).is_some() {
-        assert!((1.0 == expected));
-    } else if world.get::<Vec3>(&name).is_some() {
-        assert!((0.0 == expected));
-    } else {
-        panic!("Variable {} not found", name);
-    }
+    let t1 = world.get::<Tuple4>(&name).unwrap();
+    assert!(is_equal(t1.w(), expected));
 }
 
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.red = ([-+]?\d*\.?\d+)$")]
 fn then_red_equals(world: &mut TestWorld, name: String, expected: f64) {
-    let color = world
-        .get::<Color>(&name)
-        .unwrap_or_else(|| panic!("Color {name} not found"));
-    assert!((color.r() == expected));
+    let c1 = world.get::<Color>(&name).unwrap();
+    assert!(is_equal(c1.r(), expected));
 }
 
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.green = ([-+]?\d*\.?\d+)$")]
 fn then_green_equals(world: &mut TestWorld, name: String, expected: f64) {
-    let color = world
-        .get::<Color>(&name)
-        .unwrap_or_else(|| panic!("Color {name} not found"));
-    assert!((color.g() == expected));
+    let c1 = world.get::<Color>(&name).unwrap();
+    assert!(is_equal(c1.g(), expected));
 }
 
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.blue = ([-+]?\d*\.?\d+)$")]
 fn then_blue_equals(world: &mut TestWorld, name: String, expected: f64) {
-    let color = world
-        .get::<Color>(&name)
-        .unwrap_or_else(|| panic!("Color {name} not found"));
-    assert!((color.b() == expected));
+    let c1 = world.get::<Color>(&name).unwrap();
+    assert!(is_equal(c1.b(), expected));
 }
 
 // ===============================================================================
-// Thens - Type Checks
+// Then Steps - Tuple Type Checking
 // ===============================================================================
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is a point$")]
 fn then_is_point(world: &mut TestWorld, name: String) {
-    let tuple = world
-        .get::<Tuple4>(&name)
-        .unwrap_or_else(|| panic!("Tuple {} not found", name));
-    assert!(tuple.is_point());
+    let t1 = world.get::<Tuple4>(&name).unwrap();
+    assert!(t1.is_point());
 }
 
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is not a point$")]
 fn then_is_not_point(world: &mut TestWorld, name: String) {
-    let tuple = world
-        .get::<Tuple4>(&name)
-        .unwrap_or_else(|| panic!("Tuple {} not found", name));
-    assert!(!tuple.is_point());
+    let t1 = world.get::<Tuple4>(&name).unwrap();
+    assert!(!t1.is_point());
 }
 
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is a vector$")]
 fn then_is_vector(world: &mut TestWorld, name: String) {
-    let tuple = world
-        .get::<Tuple4>(&name)
-        .unwrap_or_else(|| panic!("Tuple {} not found", name));
-    assert!(tuple.is_vector());
+    let t1 = world.get::<Tuple4>(&name).unwrap();
+    assert!(t1.is_vector());
 }
 
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) is not a vector$")]
 fn then_is_not_vector(world: &mut TestWorld, name: String) {
-    let tuple = world
-        .get::<Tuple4>(&name)
-        .unwrap_or_else(|| panic!("Tuple {} not found", name));
-    assert!(!tuple.is_vector());
+    let t1 = world.get::<Tuple4>(&name).unwrap();
+    assert!(!t1.is_vector());
 }
 
 // ===============================================================================
-// Thens - Equality
+// Then Steps - Equality
 // ===============================================================================
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_equals_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64, w: f64) {
-    let expected = Tuple4::new(x, y, z, w);
-
-    if let Some(tuple) = world.get::<Tuple4>(&name) {
-        assert_eq!(*tuple, expected);
-    } else if let Some(point) = world.get::<Point3>(&name) {
-        let point_as_tuple = Tuple4::new(point.x(), point.y(), point.z(), 1.0);
-        assert_eq!(point_as_tuple, expected);
-    } else if let Some(vector) = world.get::<Vec3>(&name) {
-        let vector_as_tuple = Tuple4::new(vector.x(), vector.y(), vector.z(), 0.0);
-        assert_eq!(vector_as_tuple, expected);
-    } else {
-        panic!("Variable {} not found", name);
-    }
+    let actual = world.get::<Tuple4>(&name).unwrap();
+    let expected = tuple(x, y, z, w);
+    assert_eq!(*actual, expected);
 }
 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = point\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_equals_point(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64) {
-    if let Some(point) = world.get::<Point3>(&name) {
-        let expected = Point3::new(x, y, z);
-        assert_eq!(*point, expected);
-    } else if let Some(tuple) = world.get::<Tuple4>(&name) {
-        let expected = Tuple4::new(x, y, z, 1.0);
-        assert_eq!(*tuple, expected);
-    } else {
-        panic!("Point or tuple {} not found", name);
-    }
+    let actual = world.get::<Tuple4>(&name).unwrap();
+    let expected = Tuple4::from(point(x, y, z));
+    assert_eq!(*actual, expected);
 }
 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = vector\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_equals_vector(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64) {
-    if let Some(vector) = world.get::<Vec3>(&name) {
-        let expected = Vec3::new(x, y, z);
-        assert_eq!(*vector, expected);
-    } else if let Some(tuple) = world.get::<Tuple4>(&name) {
-        let expected = Tuple4::new(x, y, z, 0.0);
-        assert_eq!(*tuple, expected);
-    } else {
-        panic!("Vector or tuple {} not found", name);
-    }
+    let actual = world.get::<Tuple4>(&name).unwrap();
+    let expected = Tuple4::from(vector(x, y, z));
+    assert_eq!(*actual, expected);
 }
 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = color\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_equals_color(world: &mut TestWorld, name: String, r: f64, g: f64, b: f64) {
-    let color = world
-        .get::<Color>(&name)
-        .unwrap_or_else(|| panic!("Color {} not found", name));
-    let expected = Color::new(r, g, b);
-    assert_eq!(*color, expected);
+    let actual = world.get::<Color>(&name).unwrap();
+    let expected = color(r, g, b);
+    assert_eq!(*actual, expected);
 }
 
 // ===============================================================================
-// Thens - Operations
+// Then Steps - Operations
 // ===============================================================================
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \+ ([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_add_equals_tuple(world: &mut TestWorld, a: String, b: String, x: f64, y: f64, z: f64, w: f64) {
-    let expected = Tuple4::new(x, y, z, w);
+    let a = world.get::<Tuple4>(&a).unwrap();
+    let b = world.get::<Tuple4>(&b).unwrap();
 
-    let a = get_as_tuple(world, &a);
-    let b = get_as_tuple(world, &b);
-
-    let result = Tuple4::new(a.x() + b.x(), a.y() + b.y(), a.z() + b.z(), a.w() + b.w());
-    assert_eq!(result, expected);
+    let actual = *a + *b;
+    let expected = tuple(x, y, z, w);
+    assert_eq!(actual, expected);
 }
 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \+ ([a-zA-Z_][a-zA-Z0-9_]*) = color\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
-fn then_add_equals_color(world: &mut TestWorld, x: String, y: String, r: f64, g: f64, b: f64) {
-    let color_a = world
-        .get::<Color>(&x)
-        .unwrap_or_else(|| panic!("Color {} not found", x));
-    let color_b = world
-        .get::<Color>(&y)
-        .unwrap_or_else(|| panic!("Color {} not found", y));
+fn then_add_equals_color(world: &mut TestWorld, ca: String, cb: String, r: f64, g: f64, b: f64) {
+    let color_a = world.get::<Color>(&ca).unwrap();
+    let color_b = world.get::<Color>(&cb).unwrap();
 
-    // Assuming Color has Add trait implemented
-    let result = *color_a + *color_b;
-    let expected = Color::new(r, g, b);
-    assert_eq!(result, expected);
+    let actual = *color_a + *color_b;
+    let expected = color(r, g, b);
+    assert_eq!(actual, expected);
 }
 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) - ([a-zA-Z_][a-zA-Z0-9_]*) = vector\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_sub_equals_vector(world: &mut TestWorld, a: String, b: String, x: f64, y: f64, z: f64) {
-    let expected = vector(x, y, z);
+    let a = world.get::<Tuple4>(&a).unwrap();
+    let b = world.get::<Tuple4>(&b).unwrap();
 
-    // Handle Point - Point = Vector or Vector - Vector = Vector
-    if let (Some(p1), Some(p2)) = (world.get::<Point3>(&a), world.get::<Point3>(&b)) {
-        let result = *p1 - *p2;
-        assert_eq!(result, expected);
-    } else if let (Some(v1), Some(v2)) = (world.get::<Vec3>(&a), world.get::<Vec3>(&b)) {
-        let result = *v1 - *v2;
-        assert_eq!(result, expected);
-    } else {
-        panic!("Cannot subtract {} - {}", a, b);
-    }
+    let actual = *a - *b;
+    let expected = Tuple4::from(vector(x, y, z));
+    assert_eq!(actual, expected);
 }
 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) - ([a-zA-Z_][a-zA-Z0-9_]*) = point\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_sub_equals_point(world: &mut TestWorld, a: String, b: String, x: f64, y: f64, z: f64) {
-    let expected = point(x, y, z);
+    let a = world.get::<Tuple4>(&a).unwrap();
+    let b = world.get::<Tuple4>(&b).unwrap();
 
-    // Handle Point - Vector = Point
-    let point = world
-        .get::<Point3>(&a)
-        .unwrap_or_else(|| panic!("Point {} not found", a));
-    let vector = world
-        .get::<Vec3>(&b)
-        .unwrap_or_else(|| panic!("Vector {} not found", b));
-    let result = *point - *vector;
-    assert_eq!(result, expected);
+    let actual = *a - *b;
+    let expected = Tuple4::from(point(x, y, z));
+    assert_eq!(actual, expected);
 }
 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) - ([a-zA-Z_][a-zA-Z0-9_]*) = color\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
-fn then_sub_equals_color(world: &mut TestWorld, x: String, y: String, r: f64, g: f64, b: f64) {
+fn then_sub_equals_color(world: &mut TestWorld, ca: String, cb: String, r: f64, g: f64, b: f64) {
+    let color_a = world.get::<Color>(&ca).unwrap();
+    let color_b = world.get::<Color>(&cb).unwrap();
+
+    let actual = *color_a - *color_b;
     let expected = color(r, g, b);
-
-    let color_a = world
-        .get::<Color>(&x)
-        .unwrap_or_else(|| panic!("Color {} not found", x));
-    let color_b = world
-        .get::<Color>(&y)
-        .unwrap_or_else(|| panic!("Color {} not found", y));
-
-    let result = *color_a - *color_b;
-    assert_eq!(result, expected);
+    assert_eq!(actual, expected);
 }
 
 #[then(
     regex = r"^-([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_neg_equals_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64, w: f64) {
-    let t = get_as_tuple(world, &name);
+    let t1 = world.get::<Tuple4>(&name).unwrap();
 
-    let result = Tuple4::new(-t.x(), -t.y(), -t.z(), -t.w());
-    let expected = Tuple4::new(x, y, z, w);
-    assert_eq!(result, expected);
+    let actual = -*t1; // dereference, then neg
+    let expected = tuple(x, y, z, w);
+    assert_eq!(actual, expected);
 }
 
 #[then(
@@ -339,40 +260,34 @@ fn then_mul_scalar_equals_tuple(
     z: f64,
     w: f64,
 ) {
-    let t = get_as_tuple(world, &name);
+    let t1 = world.get::<Tuple4>(&name).unwrap();
 
-    let expected = Tuple4::new(x, y, z, w);
-    let result = Tuple4::new(t.x() * scalar, t.y() * scalar, t.z() * scalar, t.w() * scalar);
-    assert_eq!(result, expected);
+    let actual = *t1 * scalar;
+    let expected = tuple(x, y, z, w);
+    assert_eq!(actual, expected);
 }
 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \* ([-+]?\d*\.?\d+) = color\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_mul_scalar_equals_color(world: &mut TestWorld, name: String, scalar: f64, r: f64, g: f64, b: f64) {
-    let color = world
-        .get::<Color>(&name)
-        .unwrap_or_else(|| panic!("Color {} not found", name));
+    let c1 = world.get::<Color>(&name).unwrap();
 
-    let result = *color * scalar;
-    let expected = Color::new(r, g, b);
-    assert_eq!(result, expected);
+    let actual = *c1 * scalar;
+    let expected = color(r, g, b);
+    assert_eq!(actual, expected);
 }
 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \* ([a-zA-Z_][a-zA-Z0-9_]*) = color\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
-fn then_mul_equals_color(world: &mut TestWorld, x: String, y: String, r: f64, g: f64, b: f64) {
-    let color_a = world
-        .get::<Color>(&x)
-        .unwrap_or_else(|| panic!("Color {} not found", x));
-    let color_b = world
-        .get::<Color>(&y)
-        .unwrap_or_else(|| panic!("Color {} not found", y));
+fn then_mul_equals_color(world: &mut TestWorld, ca: String, cb: String, r: f64, g: f64, b: f64) {
+    let color_a = world.get::<Color>(&ca).unwrap();
+    let color_b = world.get::<Color>(&cb).unwrap();
 
-    let result = *color_a * *color_b;
-    let expected = Color::new(r, g, b);
-    assert_eq!(result, expected);
+    let actual = *color_a * *color_b;
+    let expected = color(r, g, b);
+    assert_eq!(actual, expected);
 }
 
 #[then(
@@ -387,31 +302,31 @@ fn then_div_equals_tuple(
     z: f64,
     w: f64,
 ) {
-    let t = get_as_tuple(world, &name);
+    let t1 = world.get::<Tuple4>(&name).unwrap();
 
-    let result = Tuple4::new(t.x() / divisor, t.y() / divisor, t.z() / divisor, t.w() / divisor);
-    let expected = Tuple4::new(x, y, z, w);
-    assert_eq!(result, expected);
+    let actual = *t1 / divisor;
+    let expected = tuple(x, y, z, w);
+    assert_eq!(actual, expected);
 }
 
 // Magnitude
 #[then(regex = r"^magnitude\(([a-zA-Z_][a-zA-Z0-9_]*)\) = ([-+]?\d*\.?\d+)$")]
 fn then_magnitude_equals(world: &mut TestWorld, name: String, expected: f64) {
-    let vector = world
-        .get::<Vec3>(&name)
-        .unwrap_or_else(|| panic!("Vector {} not found", name));
-    let magnitude = vector.magnitude();
-    assert!(magnitude == expected);
+    let v = world.get::<Tuple4>(&name).unwrap();
+    let v = Vec3::try_from(v).unwrap();
+
+    let actual = v.magnitude();
+    assert_eq!(actual, expected);
 }
 
 #[then(regex = r"^magnitude\(([a-zA-Z_][a-zA-Z0-9_]*)\) = √(\d+)$")]
 fn then_magnitude_equals_sqrt(world: &mut TestWorld, name: String, value: f64) {
-    let vector = world
-        .get::<Vec3>(&name)
-        .unwrap_or_else(|| panic!("Vector {} not found", name));
-    let magnitude = vector.magnitude();
+    let v = world.get::<Tuple4>(&name).unwrap();
+    let v = Vec3::try_from(v).unwrap();
+
+    let actual = v.magnitude();
     let expected = value.sqrt();
-    assert!(magnitude == expected);
+    assert_eq!(actual, expected);
 }
 
 // Normalize
@@ -419,49 +334,49 @@ fn then_magnitude_equals_sqrt(world: &mut TestWorld, name: String, value: f64) {
     regex = r"^normalize\(([a-zA-Z_][a-zA-Z0-9_]*)\) = vector\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_normalize_equals_vector(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64) {
-    let vector = world
-        .get::<Vec3>(&name)
-        .unwrap_or_else(|| panic!("Vector {} not found", name));
-    let result = vector.normalize().expect("Cannot normalize zero vector");
-    let expected = Vec3::new(x, y, z);
-    assert_eq!(result, expected);
+    let v = world.get::<Tuple4>(&name).unwrap();
+    let v = Vec3::try_from(v).unwrap();
+
+    let actual = v.normalize().expect("Cannot normalize zero vector");
+    let expected = vector(x, y, z);
+    assert_eq!(actual, expected);
 }
 
 #[then(
     regex = r"^normalize\(([a-zA-Z_][a-zA-Z0-9_]*)\) = approximately vector\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_normalize_approximately_equals_vector(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64) {
-    let vector = world
-        .get::<Vec3>(&name)
-        .unwrap_or_else(|| panic!("Vector {} not found", name));
-    let result = vector.normalize().expect("Cannot normalize zero vector");
-    let expected = Vec3::new(x, y, z);
-    assert_eq!(result, expected);
+    let v = world.get::<Tuple4>(&name).unwrap();
+    let v = Vec3::try_from(v).unwrap();
+
+    let actual = v.normalize().expect("Cannot normalize zero vector");
+    let expected = vector(x, y, z);
+    assert_eq!(actual, expected);
 }
 
 #[then(regex = r"^dot\(([a-zA-Z_][a-zA-Z0-9_]*), ([a-zA-Z_][a-zA-Z0-9_]*)\) = ([-+]?\d*\.?\d+)$")]
 fn then_dot_equals(world: &mut TestWorld, a: String, b: String, expected: f64) {
-    let vector_a = world
-        .get::<Vec3>(&a)
-        .unwrap_or_else(|| panic!("Vector {} not found", a));
-    let vector_b = world
-        .get::<Vec3>(&b)
-        .unwrap_or_else(|| panic!("Vector {} not found", b));
-    let result = vector_a.dot(*vector_b);
-    assert_eq!(result, expected);
+    let v1 = world.get::<Tuple4>(&a).unwrap();
+    let v1 = Vec3::try_from(v1).unwrap();
+    let v2 = world.get::<Tuple4>(&b).unwrap();
+    let v2 = Vec3::try_from(v2).unwrap();
+
+    // ? should I be using the bitxor sign for dot ops on vector?
+    let actual = v1 ^ v2;
+    assert_eq!(actual, expected);
 }
 
 #[then(
     regex = r"^cross\(([a-zA-Z_][a-zA-Z0-9_]*), ([a-zA-Z_][a-zA-Z0-9_]*)\) = vector\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
 fn then_cross_equals_vector(world: &mut TestWorld, a: String, b: String, x: f64, y: f64, z: f64) {
-    let vector_a = world
-        .get::<Vec3>(&a)
-        .unwrap_or_else(|| panic!("Vector {} not found", a));
-    let vector_b = world
-        .get::<Vec3>(&b)
-        .unwrap_or_else(|| panic!("Vector {} not found", b));
-    let result = vector_a.cross(*vector_b);
-    let expected = Vec3::new(x, y, z);
-    assert_eq!(result, expected);
+    let v1 = world.get::<Tuple4>(&a).unwrap();
+    let v1 = Vec3::try_from(v1).unwrap();
+    let v2 = world.get::<Tuple4>(&b).unwrap();
+    let v2 = Vec3::try_from(v2).unwrap();
+
+    // ? should I be using the mul sign for cross ops on vector?
+    let actual = v1 * v2;
+    let expected = vector(x, y, z);
+    assert_eq!(actual, expected);
 }

@@ -1,19 +1,45 @@
 [package]
-  name = "raytracer"
-  description = "A ray tracing library based on the book 'The Ray Tracer Challenge' by Jamis Buck."
-  homepage = "https://github.com/princemuel/raytracer"
-  repository = "https://github.com/princemuel/raytracer"
-  version = "0.1.0"
-  edition = "2024"
-  license = "MIT"
+name = "raytracer"
+version = "0.1.0"
+authors = [ "Prince Muel <68931805+princemuel@users.noreply.github.com>" ]
+edition = "2024"
 
-[dependencies]
+readme = "README.md"
+license = "MIT"
 
+homepage = "https://github.com/princemuel/raytracer#readme"
+repository = "https://github.com/princemuel/raytracer"
+documentation = "https://docs.rs/raytracer/"
+
+description = "A Ray Tracer library implementation of the Ray Tracer Challenge book by Jamis Buck."
+
+keywords = [ "api", "rest", "http", "exercism" ]
+categories = [ "api-bindings", "asynchronous" ]
+
+include = [ "src/**/*", "tests/**/*", "LICENSE", "README.md" ]
+
+[package.metadata.docs.rs]
+all-features = true
+targets = [ "x86_64-unknown-linux-gnu" ]
+rustc-args = [ "--cfg", "docsrs" ]
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = [
+    "cfg(tarpaulin)",
+    "cfg(tarpaulin_include)",
+    "cfg(coverage)",
+    "cfg(coverage_nightly)",
+    "cfg(mini_exercism_enable_tests_with_real_endpoints)"
+]
 
 [dev-dependencies]
-  cucumber = "0.21"
-  tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
+cucumber = "0.21"
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "test-util"] }
 
 [[test]]
-  name = "cucumber" # this should be the same as the filename of your test target
-  harness = false  # Allows Cucumber to print output instead of libtest
+name = "cucumber"
+harness = false
+
+[dependencies]
+libm = "0.2.15"
