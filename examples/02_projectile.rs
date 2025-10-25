@@ -12,7 +12,7 @@ fn main() -> io::Result<()> {
         position: point(0, 1, 0),
     };
 
-    let color = Color3::red();
+    let color = Color3::RED;
     let e = Environment {
         gravity: vector(0, -0.1, 0),
         wind:    vector(-0.01, 0, 0),

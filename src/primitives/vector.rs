@@ -267,6 +267,7 @@ impl Default for Vec3 {
 }
 
 impl PartialEq for Vec3 {
+    #[inline]
     fn eq(&self, rhs: &Self) -> bool {
         is_equal(self.x(), rhs.x())
             && is_equal(self.y(), rhs.y())
@@ -345,8 +346,8 @@ macro_rules! impl_ops {
 }
 
 impl_ops!(Vec3, f64, Mul, mul, *);
-impl_ops!(Vec3, f64, Add, add, +);
 impl_ops!(Vec3, f64, Div, div, /);
+impl_ops!(Vec3, f64, Add, add, +);
 impl_ops!(Vec3, f64, Sub, sub, -);
 
 impl Neg for Vec3 {

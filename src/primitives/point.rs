@@ -80,6 +80,7 @@ impl Default for Point3 {
 }
 
 impl PartialEq for Point3 {
+    #[inline]
     fn eq(&self, rhs: &Self) -> bool {
         is_equal(self.x(), rhs.x())
             && is_equal(self.y(), rhs.y())

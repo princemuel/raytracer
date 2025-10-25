@@ -85,6 +85,7 @@ impl Default for Tuple4 {
 }
 
 impl PartialEq for Tuple4 {
+    #[inline]
     fn eq(&self, rhs: &Self) -> bool {
         is_equal(self.x(), rhs.x())
             && is_equal(self.y(), rhs.y())
@@ -99,7 +100,7 @@ macro_rules! impl_ops {
             type Output = Self;
             #[inline]
             fn $func(self, rhs: Self) -> Self::Output {
-                Self(self.0 $op rhs.0, self.1 $op rhs.1, self.2 $op rhs.2, self.3 $op rhs.3)
+                Self(self.x() $op rhs.x(), self.y() $op rhs.y(), self.z() $op rhs.z(), self.w() $op rhs.w())
             }
         }
 
@@ -131,7 +132,7 @@ macro_rules! impl_ops {
             type Output = Self;
             #[inline]
             fn $func(self, rhs: $t) -> Self::Output {
-                Self(self.0 $op rhs, self.1 $op rhs, self.2 $op rhs, self.3 $op rhs)
+                Self(self.x() $op rhs, self.y() $op rhs, self.z() $op rhs, self.w() $op rhs)
             }
         }
 
@@ -162,8 +163,8 @@ macro_rules! impl_ops {
 }
 
 impl_ops!(Tuple4, f64, Mul, mul, *);
-impl_ops!(Tuple4, f64, Add, add, +);
 impl_ops!(Tuple4, f64, Div, div, /);
+impl_ops!(Tuple4, f64, Add, add, +);
 impl_ops!(Tuple4, f64, Sub, sub, -);
 
 impl Neg for Tuple4 {

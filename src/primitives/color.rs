@@ -13,83 +13,143 @@ where
     Color3::new(r.into(), g.into(), b.into())
 }
 
-/// RGB Color with floating-point components
-#[derive(Clone, Copy, Debug, Default)]
+/// A 3-dimensional Color in RGB with floating-point components
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
 pub struct Color3(f64, f64, f64);
-
 impl Color3 {
-    #[inline]
+    /// Creates a new color.
+    #[must_use]
+    #[inline(always)]
     pub const fn new(r: f64, g: f64, b: f64) -> Self { Self(r, g, b) }
 
-    #[inline]
-    pub const fn black() -> Self { Self::new(0.0, 0.0, 0.0) }
+    /// Creates a color with all elements set to `value`.
+    #[must_use]
+    #[inline(always)]
+    pub const fn splat(value: f64) -> Self { Self(value, value, value) }
+}
 
-    #[inline]
-    pub const fn white() -> Self { Self::new(1.0, 1.0, 1.0) }
+impl Color3 {
+    /// All zeroes.
+    // #000
+    pub const BLACK: Self = Self::splat(0.0);
+    /// A unit color with the `blue` component set to 1
+    // #00f
+    pub const BLUE: Self = Self::new(0.0, 0.0, 1.0);
+    /// A unit color with the `green` and `blue` components set to 1
+    // #0ff
+    pub const CYAN: Self = Self::new(0.0, 1.0, 1.0);
+    /// A unit color with the `green` component set to 1
+    // #0f0
+    pub const GREEN: Self = Self::new(0.0, 1.0, 0.0);
+    /// A unit color with the `red` and `blue` components set to 1
+    // #f0f
+    pub const PINK: Self = Self::new(1.0, 0.0, 1.0);
+    /// A unit color with the `red` component set to 1
+    // #f00
+    pub const RED: Self = Self::new(1.0, 0.0, 0.0);
+    /// All ones.
+    // #fff
+    pub const WHITE: Self = Self::splat(1.0);
+    /// A unit color with the `red` and `green` components set to 1
+    // #ff0
+    pub const YELLOW: Self = Self::new(1.0, 1.0, 0.0);
+}
 
-    #[inline]
-    pub const fn red() -> Self { Self::new(1.0, 0.0, 0.0) }
-
-    #[inline]
-    pub const fn green() -> Self { Self::new(0.0, 1.0, 0.0) }
-
-    #[inline]
-    pub const fn blue() -> Self { Self::new(0.0, 0.0, 1.0) }
-
-    #[inline]
+impl Color3 {
     pub const fn r(&self) -> f64 { self.0 }
 
-    #[inline]
     pub const fn g(&self) -> f64 { self.1 }
 
-    #[inline]
     pub const fn b(&self) -> f64 { self.2 }
+
+    pub const fn w(&self) -> f64 { 1.0 }
+}
+
+impl Default for Color3 {
+    #[inline(always)]
+    fn default() -> Self { Self::BLACK }
 }
 
 impl PartialEq for Color3 {
+    #[inline]
     fn eq(&self, rhs: &Self) -> bool {
         is_equal(self.0, rhs.0) && is_equal(self.1, rhs.1) && is_equal(self.2, rhs.2)
     }
 }
 
-// Color3 arithmetic
-impl Add for Color3 {
-    type Output = Self;
+macro_rules! impl_ops {
+    ($Struct:ident, $t:ty, $Trait:ident, $func:ident, $op:tt) => {
+        impl $Trait for $Struct {
+            type Output = Self;
+            #[inline]
+            fn $func(self, rhs: Self) -> Self::Output {
+                Self(self.r() $op rhs.r(), self.g() $op rhs.g(), self.b() $op rhs.b())
+            }
+        }
 
-    fn add(self, rhs: Self) -> Self::Output {
-        Self::new(self.r() + rhs.r(), self.g() + rhs.g(), self.b() + rhs.b())
-    }
+        impl $Trait<&Self> for $Struct {
+            type Output = Self;
+            #[inline]
+            fn $func(self, rhs: &Self) -> Self::Output {
+                self.$func(*rhs)
+            }
+        }
+
+        impl $Trait<&$Struct> for &$Struct {
+            type Output = $Struct;
+            #[inline]
+            fn $func(self, rhs: &$Struct) -> Self::Output {
+                (*self).$func(*rhs)
+            }
+        }
+
+        impl $Trait<$Struct> for &$Struct {
+            type Output = $Struct;
+            #[inline]
+            fn $func(self, rhs: $Struct) -> Self::Output {
+                (*self).$func(rhs)
+            }
+        }
+
+        impl $Trait<$t> for $Struct {
+            type Output = Self;
+            #[inline]
+            fn $func(self, rhs: $t) -> Self::Output {
+                Self(self.r() $op rhs, self.g() $op rhs, self.b() $op rhs)
+            }
+        }
+
+        impl $Trait<&$t> for $Struct {
+            type Output = $Struct;
+            #[inline]
+            fn $func(self, rhs: &$t) -> Self::Output {
+                self.$func(*rhs)
+            }
+        }
+
+        impl $Trait<&$t> for &$Struct {
+            type Output = $Struct;
+            #[inline]
+            fn $func(self, rhs: &$t) -> Self::Output {
+                (*self).$func(*rhs)
+            }
+        }
+
+        impl $Trait<$t> for &$Struct {
+            type Output = $Struct;
+            #[inline]
+            fn $func(self, rhs: $t) -> Self::Output {
+                (*self).$func(rhs)
+            }
+        }
+
+    };
 }
 
-impl Sub for Color3 {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self::new(self.r() - rhs.r(), self.g() - rhs.g(), self.b() - rhs.b())
-    }
-}
-
-// Scalar multiplication
-impl Mul<f64> for Color3 {
-    type Output = Self;
-
-    fn mul(self, rhs: f64) -> Self::Output { Self::new(self.r() * rhs, self.g() * rhs, self.b() * rhs) }
-}
-
-impl Mul<Color3> for f64 {
-    type Output = Color3;
-
-    fn mul(self, rhs: Color3) -> Self::Output { rhs * self }
-}
-
-// Hadamard product
-impl Mul for Color3 {
-    type Output = Self;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        Self::new(self.r() * rhs.r(), self.g() * rhs.g(), self.b() * rhs.b())
-    }
-}
+impl_ops!(Color3, f64, Mul, mul, *);
+impl_ops!(Color3, f64, Add, add, +);
+impl_ops!(Color3, f64, Sub, sub, -);
 
 const INV_255: f64 = 1.0 / 255.0;
 

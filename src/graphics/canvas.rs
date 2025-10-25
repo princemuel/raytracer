@@ -16,7 +16,7 @@ impl Canvas {
         Self {
             width,
             height,
-            pixels: vec![Color3::black(); width * height],
+            pixels: vec![Color3::BLACK; width * height],
         }
     }
 

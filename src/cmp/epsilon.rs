@@ -1,8 +1,8 @@
 //! # Floating-Point Precision Utilities
 //!
 //! This module provides epsilon values and comparison helpers used by
-//! geometry types in the ray tracer. Equality on types like `Point` and
-//! `Vector` is based on tolerant comparison.
+//! geometry types in this ray tracer lib. Equality on types like `Point3` and
+//! `Vec3` is based on tolerant comparison.
 //!
 //! ```rust
 //! use raytracer::prelude::*;

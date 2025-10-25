@@ -1,4 +1,5 @@
 use crate::cmp::epsilon::EPSILON;
+use crate::math;
 
 pub const fn is_equal(a: f64, b: f64) -> bool {
     // Fast path: exact equality (handles infinities, zeros, and exact matches)
@@ -16,18 +17,18 @@ pub const fn is_equal(a: f64, b: f64) -> bool {
         return false; // Different infinities or one infinite, one finite
     }
 
-    let diff = (a - b).abs();
+    let diff = math::abs(a - b);
 
     // For very small numbers near zero, use absolute epsilon
-    if a.abs().max(b.abs()) < 1.0 {
+    if math::max(a, math::abs(b)) < 1.0 {
         return diff < EPSILON;
     }
 
     // For larger numbers, use relative epsilon to maintain precision
     // This prevents issues when comparing large coordinate values
-    let relative_epsilon = EPSILON * a.abs().max(b.abs());
+    let relative_epsilon = EPSILON * math::max(a, math::abs(b));
 
     // Use the larger of absolute and relative epsilon
     // This handles edge cases around 1.0 and ensures consistent behavior
-    diff < EPSILON.max(relative_epsilon)
+    diff < math::max(EPSILON, relative_epsilon)
 }

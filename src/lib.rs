@@ -17,7 +17,7 @@ pub mod cmp;
 pub mod error;
 pub mod geometry;
 pub mod graphics;
-pub mod math;
+mod math;
 pub mod prelude;
 pub mod primitives;
 pub mod shading;
