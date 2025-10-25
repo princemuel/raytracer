@@ -93,32 +93,24 @@ impl Vec3 {
     #[inline]
     #[must_use]
     pub const fn dot(self, rhs: Self) -> f64 {
-        (self.x() * rhs.x()) + (self.y() * rhs.y()) + (self.z() * rhs.z())
+        (self.x() * rhs.x()) + (self.y() * rhs.y()) + (self.z() * rhs.z()) + (self.w() * rhs.w())
     }
 
     /// Returns a vector where every component is the dot product of `self` and
     /// `rhs`.
     #[inline]
     #[must_use]
-    pub const fn dot_into_vec(self, rhs: Self) -> Self { Self::splat(self.dot(rhs)) }
+    pub const fn dot_to_vec(self, rhs: Self) -> Self { Self::splat(self.dot(rhs)) }
 
     /// Computes the cross product of `self` and `rhs`.
     #[inline]
     #[must_use]
     pub const fn cross(self, rhs: Self) -> Self {
         Self(
-            self.y() * rhs.z() - rhs.y() * self.z(),
-            self.z() * rhs.x() - rhs.z() * self.x(),
-            self.x() * rhs.y() - rhs.x() * self.y(),
+            self.y() * rhs.z() - self.z() * rhs.y(),
+            self.z() * rhs.x() - self.x() * rhs.z(),
+            self.x() * rhs.y() - self.y() * rhs.x(),
         )
-    }
-
-    /// The magnitude (length) of vector.
-    /// It means the distance from one end of the vector to the other.
-    #[inline]
-    #[deprecated(note = "use `Vec3::length` instead")]
-    pub fn magnitude(&self) -> f64 {
-        f64::sqrt(self.x() * self.x() + self.y() * self.y() + self.z() * self.z())
     }
 
     /// Computes the length of `self`.
@@ -154,7 +146,7 @@ impl Vec3 {
 
     /// Returns `self` normalized to length 1.0 (unit length)
     ///
-    /// For valid results, `self` must be finite () and _not_ of length zero,
+    /// For valid results, `self` must be finite and _not_ of length zero,
     /// nor very close to zero.
     ///
     /// See also [`Self::try_normalize()`] and [`Self::normalize_or_zero()`].
@@ -176,9 +168,6 @@ impl Vec3 {
     #[inline]
     #[must_use]
     pub fn try_normalize(self) -> Option<Self> {
-        // let reciprocal = self.length_recip();
-        // (reciprocal.is_finite() && reciprocal >= EPSILON).then(|| self * reciprocal)
-
         let len = self.length();
         (len.is_finite() && len >= EPSILON).then(|| self / len)
     }
@@ -279,7 +268,10 @@ impl Default for Vec3 {
 
 impl PartialEq for Vec3 {
     fn eq(&self, rhs: &Self) -> bool {
-        is_equal(self.x(), rhs.x()) && is_equal(self.y(), rhs.y()) && is_equal(self.z(), rhs.z())
+        is_equal(self.x(), rhs.x())
+            && is_equal(self.y(), rhs.y())
+            && is_equal(self.z(), rhs.z())
+            && is_equal(self.w(), rhs.w())
     }
 }
 

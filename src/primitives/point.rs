@@ -4,7 +4,7 @@ use crate::cmp::float::is_equal;
 use crate::primitives::tuple::Tuple4;
 use crate::primitives::vector::Vec3;
 
-/// Create a 3D point
+/// Create a 3-dimensional point
 #[inline]
 pub fn point<X, Y, Z>(x: X, y: Y, z: Z) -> Point3
 where
@@ -81,7 +81,10 @@ impl Default for Point3 {
 
 impl PartialEq for Point3 {
     fn eq(&self, rhs: &Self) -> bool {
-        is_equal(self.0, rhs.0) && is_equal(self.1, rhs.1) && is_equal(self.2, rhs.2)
+        is_equal(self.x(), rhs.x())
+            && is_equal(self.y(), rhs.y())
+            && is_equal(self.z(), rhs.z())
+            && is_equal(self.w(), rhs.w())
     }
 }
 

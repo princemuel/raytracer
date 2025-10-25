@@ -1,4 +1,5 @@
-#[derive(Copy, Clone, Debug)]
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
 pub struct Matrix<T, const ROWS: usize, const COLS: usize>
 where
     [(); ROWS * COLS]:,
@@ -27,7 +28,7 @@ where
 {
     #[inline]
     fn from(v: Vec<T>) -> Self {
-        assert_eq!(N * N, v.len());
+        debug_assert_eq!(N * N, v.len());
         let mut result = Self {
             buffer: [T::default(); N * N],
         };

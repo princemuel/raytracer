@@ -5,7 +5,7 @@ use crate::cmp::float::is_equal;
 use crate::primitives::point::Point3;
 use crate::primitives::vector::Vec3;
 
-/// Create a 4-dimensional tuple
+/// Creates a 4-dimensional tuple
 #[inline]
 pub fn tuple<X, Y, Z, W>(x: X, y: Y, z: Z, w: W) -> Tuple4
 where
@@ -18,6 +18,7 @@ where
 }
 
 /// A 4-dimensional tuple. Can represent either a point or a vector.
+#[repr(C)]
 #[derive(Clone, Copy, Debug)]
 pub struct Tuple4(f64, f64, f64, f64);
 impl Tuple4 {
@@ -85,10 +86,10 @@ impl Default for Tuple4 {
 
 impl PartialEq for Tuple4 {
     fn eq(&self, rhs: &Self) -> bool {
-        is_equal(self.0, rhs.0)
-            && is_equal(self.1, rhs.1)
-            && is_equal(self.2, rhs.2)
-            && is_equal(self.3, rhs.3)
+        is_equal(self.x(), rhs.x())
+            && is_equal(self.y(), rhs.y())
+            && is_equal(self.z(), rhs.z())
+            && is_equal(self.w(), rhs.w())
     }
 }
 
