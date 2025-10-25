@@ -196,7 +196,7 @@ fn then_add_equals_color(world: &mut TestWorld, ca: String, cb: String, r: f64, 
     let color_a = world.get::<Color>(&ca).unwrap();
     let color_b = world.get::<Color>(&cb).unwrap();
 
-    let actual = *color_a + *color_b;
+    let actual = color_a + color_b;
     let expected = color(r, g, b);
     assert_eq!(actual, expected);
 }
@@ -232,7 +232,7 @@ fn then_sub_equals_color(world: &mut TestWorld, ca: String, cb: String, r: f64, 
     let color_a = world.get::<Color>(&ca).unwrap();
     let color_b = world.get::<Color>(&cb).unwrap();
 
-    let actual = *color_a - *color_b;
+    let actual = color_a - color_b;
     let expected = color(r, g, b);
     assert_eq!(actual, expected);
 }
@@ -273,7 +273,7 @@ fn then_mul_scalar_equals_tuple(
 fn then_mul_scalar_equals_color(world: &mut TestWorld, name: String, scalar: f64, r: f64, g: f64, b: f64) {
     let c1 = world.get::<Color>(&name).unwrap();
 
-    let actual = *c1 * scalar;
+    let actual = c1 * scalar;
     let expected = color(r, g, b);
     assert_eq!(actual, expected);
 }
@@ -285,7 +285,7 @@ fn then_mul_equals_color(world: &mut TestWorld, ca: String, cb: String, r: f64, 
     let color_a = world.get::<Color>(&ca).unwrap();
     let color_b = world.get::<Color>(&cb).unwrap();
 
-    let actual = *color_a * *color_b;
+    let actual = color_a * color_b;
     let expected = color(r, g, b);
     assert_eq!(actual, expected);
 }
@@ -293,18 +293,10 @@ fn then_mul_equals_color(world: &mut TestWorld, ca: String, cb: String, r: f64, 
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) / ([-+]?\d*\.?\d+) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]
-fn then_div_equals_tuple(
-    world: &mut TestWorld,
-    name: String,
-    divisor: f64,
-    x: f64,
-    y: f64,
-    z: f64,
-    w: f64,
-) {
+fn then_div_equals_tuple(world: &mut TestWorld, name: String, scalar: f64, x: f64, y: f64, z: f64, w: f64) {
     let t1 = world.get::<Tuple4>(&name).unwrap();
 
-    let actual = t1 / divisor;
+    let actual = t1 / scalar;
     let expected = tuple(x, y, z, w);
     assert_eq!(actual, expected);
 }
@@ -337,8 +329,8 @@ fn then_normalize_equals_vector(world: &mut TestWorld, name: String, x: f64, y: 
     let v = world.get::<Tuple4>(&name).unwrap();
     let v = Vec3::try_from(v).unwrap();
 
-    let actual = v.try_normalize().expect("Cannot normalize zero vector");
-    let expected = vector(x, y, z);
+    let actual = v.try_normalize();
+    let expected = Some(vector(x, y, z));
     assert_eq!(actual, expected);
 }
 
@@ -349,8 +341,8 @@ fn then_normalize_approximately_equals_vector(world: &mut TestWorld, name: Strin
     let v = world.get::<Tuple4>(&name).unwrap();
     let v = Vec3::try_from(v).unwrap();
 
-    let actual = v.try_normalize().expect("Cannot normalize zero vector");
-    let expected = vector(x, y, z);
+    let actual = v.try_normalize();
+    let expected = Some(vector(x, y, z));
     assert_eq!(actual, expected);
 }
 
