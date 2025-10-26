@@ -276,78 +276,116 @@ impl PartialEq for Vec3 {
     }
 }
 
-macro_rules! impl_ops {
-    ($Struct:ident, $t:ty, $Trait:ident, $func:ident, $op:tt) => {
-        impl $Trait for $Struct {
+macro_rules! impl_op {
+    ($t:ident, $trt:ident, $func:ident) => {
+        impl core::ops::$trt<&Self> for $t {
             type Output = Self;
-            #[inline]
-            fn $func(self, rhs: Self) -> Self::Output {
-                Self(self.x() $op rhs.x(), self.y() $op rhs.y(), self.z() $op rhs.z())
-            }
-        }
 
-        impl $Trait<&Self> for $Struct {
-            type Output = Self;
             #[inline]
-            fn $func(self, rhs: &Self) -> Self::Output {
-                self.$func(*rhs)
-            }
+            fn $func(self, rhs: &Self) -> Self::Output { self.$func(*rhs) }
         }
+        impl core::ops::$trt<&$t> for &$t {
+            type Output = $t;
 
-        impl $Trait<&$Struct> for &$Struct {
-            type Output = $Struct;
             #[inline]
-            fn $func(self, rhs: &$Struct) -> Self::Output {
-                (*self).$func(*rhs)
-            }
+            fn $func(self, rhs: &$t) -> Self::Output { (*self).$func(*rhs) }
         }
+        impl core::ops::$trt<$t> for &$t {
+            type Output = $t;
 
-        impl $Trait<$Struct> for &$Struct {
-            type Output = $Struct;
             #[inline]
-            fn $func(self, rhs: $Struct) -> Self::Output {
-                (*self).$func(rhs)
-            }
+            fn $func(self, rhs: $t) -> Self::Output { (*self).$func(rhs) }
         }
+    };
+    ($t:ty, $elem:ident, $trt:ident, $func:ident) => {
+        impl core::ops::$trt<&$t> for $elem {
+            type Output = $elem;
 
-        impl $Trait<$t> for $Struct {
-            type Output = Self;
             #[inline]
-            fn $func(self, rhs: $t) -> Self::Output {
-                Self(self.x() $op rhs, self.y() $op rhs, self.z() $op rhs)
-            }
+            fn $func(self, rhs: &$t) -> Self::Output { self.$func(*rhs) }
         }
+        impl core::ops::$trt<&$t> for &$elem {
+            type Output = $elem;
 
-        impl $Trait<&$t> for $Struct {
-            type Output = $Struct;
             #[inline]
-            fn $func(self, rhs: &$t) -> Self::Output {
-                self.$func(*rhs)
-            }
+            fn $func(self, rhs: &$t) -> Self::Output { (*self).$func(*rhs) }
         }
+        impl core::ops::$trt<$t> for &$elem {
+            type Output = $elem;
 
-        impl $Trait<&$t> for &$Struct {
-            type Output = $Struct;
             #[inline]
-            fn $func(self, rhs: &$t) -> Self::Output {
-                (*self).$func(*rhs)
-            }
-        }
-
-        impl $Trait<$t> for &$Struct {
-            type Output = $Struct;
-            #[inline]
-            fn $func(self, rhs: $t) -> Self::Output {
-                (*self).$func(rhs)
-            }
+            fn $func(self, rhs: $t) -> Self::Output { (*self).$func(rhs) }
         }
     };
 }
 
-impl_ops!(Vec3, f64, Mul, mul, *);
-impl_ops!(Vec3, f64, Div, div, /);
-impl_ops!(Vec3, f64, Add, add, +);
-impl_ops!(Vec3, f64, Sub, sub, -);
+impl Mul for Vec3 {
+    type Output = Self;
+
+    #[inline]
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self(self.x() * rhs.x(), self.y() * rhs.y(), self.z() * rhs.z())
+    }
+}
+impl Mul<f64> for Vec3 {
+    type Output = Self;
+
+    #[inline]
+    fn mul(self, rhs: f64) -> Self::Output { Self(self.x() * rhs, self.y() * rhs, self.z() * rhs) }
+}
+impl_op!(Vec3, Mul, mul);
+impl_op!(f64, Vec3, Mul, mul);
+
+impl Div for Vec3 {
+    type Output = Self;
+
+    #[inline]
+    fn div(self, rhs: Self) -> Self::Output {
+        Self(self.x() / rhs.x(), self.y() / rhs.y(), self.z() / rhs.z())
+    }
+}
+impl Div<f64> for Vec3 {
+    type Output = Self;
+
+    #[inline]
+    fn div(self, rhs: f64) -> Self::Output { Self(self.x() / rhs, self.y() / rhs, self.z() / rhs) }
+}
+impl_op!(Vec3, Div, div);
+impl_op!(f64, Vec3, Div, div);
+
+impl Add for Vec3 {
+    type Output = Self;
+
+    #[inline]
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.x() + rhs.x(), self.y() + rhs.y(), self.z() + rhs.z())
+    }
+}
+impl Add<f64> for Vec3 {
+    type Output = Self;
+
+    #[inline]
+    fn add(self, rhs: f64) -> Self::Output { Self(self.x() + rhs, self.y() + rhs, self.z() + rhs) }
+}
+impl_op!(Vec3, Add, add);
+impl_op!(f64, Vec3, Add, add);
+
+impl Sub for Vec3 {
+    type Output = Self;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(self.x() - rhs.x(), self.y() - rhs.y(), self.z() - rhs.z())
+    }
+}
+impl Sub<f64> for Vec3 {
+    type Output = Self;
+
+    #[inline]
+    fn sub(self, rhs: f64) -> Self::Output { Self(self.x() - rhs, self.y() - rhs, self.z() - rhs) }
+}
+impl_op!(Vec3, Sub, sub);
+impl_op!(f64, Vec3, Sub, sub);
 
 impl Neg for Vec3 {
     type Output = Self;
