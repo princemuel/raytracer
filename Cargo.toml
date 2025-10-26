@@ -9,7 +9,7 @@ license = "MIT"
 
 homepage = "https://github.com/princemuel/raytracer#readme"
 repository = "https://github.com/princemuel/raytracer"
-documentation = "https://docs.rs/raytracer/"
+# documentation = "https://docs.rs/raytracer/"
 
 description = "A Ray Tracer library implementation of the Ray Tracer Challenge book by Jamis Buck."
 

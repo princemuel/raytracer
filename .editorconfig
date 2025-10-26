@@ -17,7 +17,7 @@ trim_trailing_whitespace = true
 [{*.c,*.h,*.hpp,*.cpp,*.rb,*.lisp,*.exs,*.wat}]
 indent_size = 2
 
-[{*.yml,*.yaml,*.toml,*.json}]
+[{*.yml,*.yaml,*.toml,*.json,*.feature,*.xml,*.xsd,*.xsl,*.xslt,*.svg}]
 indent_size = 2
 
 # Specific settings for Markdown files
