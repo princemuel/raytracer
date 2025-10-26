@@ -341,7 +341,6 @@ macro_rules! impl_ops {
                 (*self).$func(rhs)
             }
         }
-
     };
 }
 
