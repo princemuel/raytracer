@@ -1,5 +1,6 @@
 mod color;
 mod components;
+mod macros;
 mod matrix;
 mod point;
 mod tuple;

@@ -21,7 +21,80 @@ impl<const N: usize> Matrix<N>
 where
     [(); N * N]: Sized,
 {
+    #[inline(always)]
     pub const fn new() -> Self { Self { buffer: [0.0; N * N] } }
+
+    // Keepin this around for potential use cases
+    #[inline(always)]
+    pub fn from_fn<F>(mut f: F) -> Self
+    where
+        F: FnMut(usize, usize) -> f64,
+    {
+        let buffer = core::array::from_fn(|i| {
+            let row = i / N;
+            let col = i % N;
+            f(row, col)
+        });
+        Self { buffer }
+    }
+}
+
+impl<const N: usize> Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    pub const IDENTITY: Self = Self::diagonal(1.0);
+}
+
+impl<const N: usize> Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    #[inline(always)]
+    pub const fn diagonal(value: f64) -> Self {
+        let mut buffer = [0.0; N * N];
+        let mut i = 0;
+        while i < N {
+            buffer[i * N + i] = value;
+            i += 1;
+        }
+        Self { buffer }
+    }
+
+    pub const fn from_diagonal(values: [f64; N]) -> Self {
+        let mut buffer = [0.0; N * N];
+        let mut i = 0;
+        while i < N {
+            buffer[i * N + i] = values[i];
+            i += 1;
+        }
+        Self { buffer }
+    }
+
+    pub const fn transpose(&self) -> Self {
+        // let mut buffer = [0.0; N * N];
+        // let mut row = 0;
+        // while row < N {
+        //     let mut col = 0;
+        //     while col < N {
+        //         buffer[col * N + row] = self.buffer[row * N + col];
+        //         col += 1;
+        //     }
+        //     row += 1;
+        // }
+
+        let mut buffer = [0.0; N * N];
+        let mut i = 0;
+
+        while i < N * N {
+            let row = i / N;
+            let col = i % N;
+            buffer[col * N + row] = self.buffer[i];
+            i += 1;
+        }
+
+        Self { buffer }
+    }
 }
 
 impl<const N: usize> Default for Matrix<N>
@@ -52,9 +125,8 @@ where
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Self {
-            buffer: core::array::from_fn(|i| self.buffer[i] + rhs.buffer[i]),
-        }
+        let buffer = core::array::from_fn(|i| self.buffer[i] + rhs.buffer[i]);
+        Self { buffer }
     }
 }
 
@@ -96,9 +168,8 @@ where
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Self {
-            buffer: core::array::from_fn(|i| self.buffer[i] - rhs.buffer[i]),
-        }
+        let buffer = core::array::from_fn(|i| self.buffer[i] - rhs.buffer[i]);
+        Self { buffer }
     }
 }
 
@@ -130,6 +201,119 @@ where
 
     #[inline]
     fn sub(self, rhs: Matrix<N>) -> Self::Output { (*self).sub(rhs) }
+}
+
+impl<const N: usize> Mul for Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    type Output = Self;
+
+    #[inline]
+    fn mul(self, rhs: Self) -> Self::Output {
+        // let mut matrix = Self::new();
+        // for row in 0..N {
+        //     for col in 0..N {
+        //         matrix[(row, col)] = (0..N).map(|k| self[(row, k)] * rhs[(k,
+        // col)]).sum();     }
+        // }
+
+        Self::from_fn(|row, col| (0..N).map(|k| self[(row, k)] * rhs[(k, col)]).sum())
+    }
+}
+
+impl<const N: usize> Mul<&Self> for Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    type Output = Self;
+
+    #[inline]
+    fn mul(self, rhs: &Self) -> Self::Output { self.mul(*rhs) }
+}
+
+impl<const N: usize> Mul<&Matrix<N>> for &Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    type Output = Matrix<N>;
+
+    #[inline]
+    fn mul(self, rhs: &Matrix<N>) -> Self::Output { (*self).mul(*rhs) }
+}
+
+impl<const N: usize> Mul<Matrix<N>> for &Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    type Output = Matrix<N>;
+
+    #[inline]
+    fn mul(self, rhs: Matrix<N>) -> Self::Output { (*self).mul(rhs) }
+}
+
+impl<const N: usize> Mul<Tuple4> for Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    type Output = Tuple4;
+
+    fn mul(self, rhs: Tuple4) -> Self::Output {
+        let v = [rhs.x(), rhs.y(), rhs.z(), rhs.w()];
+        // !NOTE: This currently only works for 4x4 matrices (0..N == 4)
+        let result: [f64; 4] =
+            core::array::from_fn(|row| (0..N).map(|col| self[(row, col)] * v[col]).sum());
+
+        Tuple4::from(result)
+    }
+}
+
+impl<const N: usize> Mul<&Tuple4> for Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    type Output = Tuple4;
+
+    #[inline]
+    fn mul(self, rhs: &Tuple4) -> Self::Output { self.mul(*rhs) }
+}
+
+impl<const N: usize> Mul<&Tuple4> for &Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    type Output = Tuple4;
+
+    #[inline]
+    fn mul(self, rhs: &Tuple4) -> Self::Output { (*self).mul(*rhs) }
+}
+
+impl<const N: usize> Mul<Tuple4> for &Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    type Output = Tuple4;
+
+    #[inline]
+    fn mul(self, rhs: Tuple4) -> Self::Output { (*self).mul(rhs) }
+}
+
+impl<const N: usize> Index<(usize, usize)> for Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    type Output = f64;
+
+    fn index(&self, (row, col): (usize, usize)) -> &Self::Output { &self.buffer[row * N + col] }
+}
+
+impl<const N: usize> IndexMut<(usize, usize)> for Matrix<N>
+where
+    [(); N * N]: Sized,
+{
+    fn index_mut(&mut self, (row, col): (usize, usize)) -> &mut Self::Output {
+        &mut self.buffer[row * N + col]
+    }
 }
 
 impl<const N: usize> Index<usize> for Matrix<N>
@@ -167,28 +351,63 @@ impl<'a, const N: usize> TryFrom<&'a [f64]> for Matrix<N>
 where
     [(); N * N]: Sized,
 {
-    type Error = String;
+    type Error = &'static str;
 
     fn try_from(src: &'a [f64]) -> Result<Self, Self::Error> {
-        if src.len() != N * N {
-            return Err(format!(
-                "source length ({}) does not match destination length ({})",
-                src.len(),
-                N * N
-            ));
-        }
-
-        let mut result = Self {
-            buffer: [Default::default(); N * N],
-        };
-        result.buffer.copy_from_slice(src);
-        Ok(result)
+        let buffer = src.try_into().map_err(|_| "slice length mismatch")?;
+        Ok(Self { buffer })
     }
 }
 
-pub type Mat2 = Matrix<2>;
-pub type Mat3 = Matrix<3>;
-pub type Mat4 = Matrix<4>;
+#[allow(unused)]
+mod matrices {
+    use super::*;
+
+    pub const trait Submatrix {
+        type Output;
+
+        fn submatrix(&self, row: usize, col: usize) -> Self::Output;
+    }
+
+    pub const trait Determinant {
+        fn determinant(&self) -> f64;
+    }
+
+    pub const trait Minor {
+        fn minor(&self, row: usize, col: usize) -> f64;
+    }
+
+    trait Cofactor {
+        fn cofactor(&self, row: usize, col: usize) -> f64;
+    }
+
+    pub trait Inverse: Sized {
+        type Output;
+
+        fn invertible(&self) -> bool;
+        fn inverse(&self) -> Option<Self::Output>;
+        // fn inverse(&self) -> Option<Self>;
+    }
+
+    // pub trait DefinedMatrix<const N: usize>
+    // where
+    //     [(); N * N]: Sized,
+    // {
+    //     fn identity() -> Matrix<N> {
+    //         let mut matrix = Matrix::<N>::new();
+    //         for i in 0..N {
+    //             matrix[i][i] = 1.0;
+    //         }
+    //         matrix
+    //     }
+    // }
+
+    pub type Mat2 = Matrix<2>;
+
+    pub type Mat3 = Matrix<3>;
+    pub type Mat4 = Matrix<4>;
+}
+pub use matrices::*;
 
 #[cfg(test)]
 mod tests {
