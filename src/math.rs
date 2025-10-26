@@ -7,16 +7,16 @@ mod std_math {
     pub(crate) const fn signum(f: f64) -> f64 { f64::signum(f) }
 
     #[inline(always)]
-    pub(crate) const fn round(f: f64) -> f64 { f64::round(f) }
-
-    #[inline(always)]
-    pub(crate) const fn trunc(f: f64) -> f64 { f64::trunc(f) }
+    pub(crate) const fn floor(f: f64) -> f64 { f64::floor(f) }
 
     #[inline(always)]
     pub(crate) const fn ceil(f: f64) -> f64 { f64::ceil(f) }
 
     #[inline(always)]
-    pub(crate) const fn floor(f: f64) -> f64 { f64::floor(f) }
+    pub(crate) const fn trunc(f: f64) -> f64 { f64::trunc(f) }
+
+    #[inline(always)]
+    pub(crate) const fn round(f: f64) -> f64 { f64::round(f) }
 
     #[inline(always)]
     pub(crate) const fn abs(f: f64) -> f64 { f64::abs(f) }
