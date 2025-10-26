@@ -3,8 +3,8 @@ use core::ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub};
 
 use crate::cmp::epsilon::EPSILON;
 use crate::cmp::float::is_equal;
-use crate::math;
 use crate::prelude::Tuple4;
+use crate::{impl_op, math};
 
 /// Creates a 3-dimensional vector.
 #[inline(always)]
@@ -276,49 +276,6 @@ impl PartialEq for Vec3 {
     }
 }
 
-macro_rules! impl_op {
-    ($t:ident, $trt:ident, $func:ident) => {
-        impl core::ops::$trt<&Self> for $t {
-            type Output = Self;
-
-            #[inline]
-            fn $func(self, rhs: &Self) -> Self::Output { self.$func(*rhs) }
-        }
-        impl core::ops::$trt<&$t> for &$t {
-            type Output = $t;
-
-            #[inline]
-            fn $func(self, rhs: &$t) -> Self::Output { (*self).$func(*rhs) }
-        }
-        impl core::ops::$trt<$t> for &$t {
-            type Output = $t;
-
-            #[inline]
-            fn $func(self, rhs: $t) -> Self::Output { (*self).$func(rhs) }
-        }
-    };
-    ($t:ty, $elem:ident, $trt:ident, $func:ident) => {
-        impl core::ops::$trt<&$t> for $elem {
-            type Output = $elem;
-
-            #[inline]
-            fn $func(self, rhs: &$t) -> Self::Output { self.$func(*rhs) }
-        }
-        impl core::ops::$trt<&$t> for &$elem {
-            type Output = $elem;
-
-            #[inline]
-            fn $func(self, rhs: &$t) -> Self::Output { (*self).$func(*rhs) }
-        }
-        impl core::ops::$trt<$t> for &$elem {
-            type Output = $elem;
-
-            #[inline]
-            fn $func(self, rhs: $t) -> Self::Output { (*self).$func(rhs) }
-        }
-    };
-}
-
 impl Mul for Vec3 {
     type Output = Self;
 
@@ -327,13 +284,14 @@ impl Mul for Vec3 {
         Self(self.x() * rhs.x(), self.y() * rhs.y(), self.z() * rhs.z())
     }
 }
+impl_op!(Vec3, Mul, mul);
+
 impl Mul<f64> for Vec3 {
     type Output = Self;
 
     #[inline]
     fn mul(self, rhs: f64) -> Self::Output { Self(self.x() * rhs, self.y() * rhs, self.z() * rhs) }
 }
-impl_op!(Vec3, Mul, mul);
 impl_op!(f64, Vec3, Mul, mul);
 
 impl Div for Vec3 {
@@ -344,13 +302,14 @@ impl Div for Vec3 {
         Self(self.x() / rhs.x(), self.y() / rhs.y(), self.z() / rhs.z())
     }
 }
+impl_op!(Vec3, Div, div);
+
 impl Div<f64> for Vec3 {
     type Output = Self;
 
     #[inline]
     fn div(self, rhs: f64) -> Self::Output { Self(self.x() / rhs, self.y() / rhs, self.z() / rhs) }
 }
-impl_op!(Vec3, Div, div);
 impl_op!(f64, Vec3, Div, div);
 
 impl Add for Vec3 {
@@ -361,13 +320,14 @@ impl Add for Vec3 {
         Self(self.x() + rhs.x(), self.y() + rhs.y(), self.z() + rhs.z())
     }
 }
+impl_op!(Vec3, Add, add);
+
 impl Add<f64> for Vec3 {
     type Output = Self;
 
     #[inline]
     fn add(self, rhs: f64) -> Self::Output { Self(self.x() + rhs, self.y() + rhs, self.z() + rhs) }
 }
-impl_op!(Vec3, Add, add);
 impl_op!(f64, Vec3, Add, add);
 
 impl Sub for Vec3 {
@@ -378,13 +338,14 @@ impl Sub for Vec3 {
         Self(self.x() - rhs.x(), self.y() - rhs.y(), self.z() - rhs.z())
     }
 }
+impl_op!(Vec3, Sub, sub);
+
 impl Sub<f64> for Vec3 {
     type Output = Self;
 
     #[inline]
     fn sub(self, rhs: f64) -> Self::Output { Self(self.x() - rhs, self.y() - rhs, self.z() - rhs) }
 }
-impl_op!(Vec3, Sub, sub);
 impl_op!(f64, Vec3, Sub, sub);
 
 impl Neg for Vec3 {
@@ -493,6 +454,7 @@ impl From<Vec3> for [f64; 3] {
     #[inline]
     fn from(v: Vec3) -> Self { [v.0, v.1, v.2] }
 }
+
 impl From<[f64; 4]> for Vec3 {
     #[inline]
     fn from(a: [f64; 4]) -> Self { Self::new(a[0], a[1], a[2]) }

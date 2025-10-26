@@ -13,11 +13,13 @@
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 #![feature(stmt_expr_attributes)]
+#![feature(const_trait_impl)]
+mod math;
+
 pub mod cmp;
 pub mod error;
 pub mod geometry;
 pub mod graphics;
-mod math;
 pub mod prelude;
 pub mod primitives;
 pub mod shading;

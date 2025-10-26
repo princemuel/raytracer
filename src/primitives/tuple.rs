@@ -2,6 +2,7 @@ use core::iter::{Product, Sum};
 use core::ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub};
 
 use crate::cmp::float::is_equal;
+use crate::impl_op;
 use crate::primitives::point::Point3;
 use crate::primitives::vector::Vec3;
 
@@ -94,84 +95,111 @@ impl PartialEq for Tuple4 {
     }
 }
 
-macro_rules! impl_ops {
-    ($Struct:ident, $t:ty, $Trait:ident, $func:ident, $op:tt) => {
-        impl $Trait for $Struct {
-            type Output = Self;
-            #[inline]
-            fn $func(self, rhs: Self) -> Self::Output {
-                Self(self.x() $op rhs.x(), self.y() $op rhs.y(), self.z() $op rhs.z(), self.w() $op rhs.w())
-            }
-        }
+impl Mul for Tuple4 {
+    type Output = Self;
 
-        impl $Trait<&Self> for $Struct {
-            type Output = Self;
-            #[inline]
-            fn $func(self, rhs: &Self) -> Self::Output {
-                self.$func(*rhs)
-            }
-        }
-
-        impl $Trait<&$Struct> for &$Struct {
-            type Output = $Struct;
-            #[inline]
-            fn $func(self, rhs: &$Struct) -> Self::Output {
-                (*self).$func(*rhs)
-            }
-        }
-
-        impl $Trait<$Struct> for &$Struct {
-            type Output = $Struct;
-            #[inline]
-            fn $func(self, rhs: $Struct) -> Self::Output {
-                (*self).$func(rhs)
-            }
-        }
-
-        impl $Trait<$t> for $Struct {
-            type Output = Self;
-            #[inline]
-            fn $func(self, rhs: $t) -> Self::Output {
-                Self(self.x() $op rhs, self.y() $op rhs, self.z() $op rhs, self.w() $op rhs)
-            }
-        }
-
-        impl $Trait<&$t> for $Struct {
-            type Output = $Struct;
-            #[inline]
-            fn $func(self, rhs: &$t) -> Self::Output {
-                self.$func(*rhs)
-            }
-        }
-
-        impl $Trait<&$t> for &$Struct {
-            type Output = $Struct;
-            #[inline]
-            fn $func(self, rhs: &$t) -> Self::Output {
-                (*self).$func(*rhs)
-            }
-        }
-
-        impl $Trait<$t> for &$Struct {
-            type Output = $Struct;
-            #[inline]
-            fn $func(self, rhs: $t) -> Self::Output {
-                (*self).$func(rhs)
-            }
-        }
-    };
+    #[inline]
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self(
+            self.x() * rhs.x(),
+            self.y() * rhs.y(),
+            self.z() * rhs.z(),
+            self.w() * rhs.w(),
+        )
+    }
 }
+impl_op!(Tuple4, Mul, mul);
 
-impl_ops!(Tuple4, f64, Mul, mul, *);
-impl_ops!(Tuple4, f64, Div, div, /);
-impl_ops!(Tuple4, f64, Add, add, +);
-impl_ops!(Tuple4, f64, Sub, sub, -);
+impl Mul<f64> for Tuple4 {
+    type Output = Self;
+
+    #[inline]
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self(self.x() * rhs, self.y() * rhs, self.z() * rhs, self.w() * rhs)
+    }
+}
+impl_op!(f64, Tuple4, Mul, mul);
+
+impl Div for Tuple4 {
+    type Output = Self;
+
+    #[inline]
+    fn div(self, rhs: Self) -> Self::Output {
+        Self(
+            self.x() / rhs.x(),
+            self.y() / rhs.y(),
+            self.z() / rhs.z(),
+            self.w() / rhs.w(),
+        )
+    }
+}
+impl_op!(Tuple4, Div, div);
+
+impl Div<f64> for Tuple4 {
+    type Output = Self;
+
+    #[inline]
+    fn div(self, rhs: f64) -> Self::Output {
+        Self(self.x() / rhs, self.y() / rhs, self.z() / rhs, self.w() / rhs)
+    }
+}
+impl_op!(f64, Tuple4, Div, div);
+
+impl Add for Tuple4 {
+    type Output = Self;
+
+    #[inline]
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(
+            self.x() + rhs.x(),
+            self.y() + rhs.y(),
+            self.z() + rhs.z(),
+            self.w() + rhs.w(),
+        )
+    }
+}
+impl_op!(Tuple4, Add, add);
+
+impl Add<f64> for Tuple4 {
+    type Output = Self;
+
+    #[inline]
+    fn add(self, rhs: f64) -> Self::Output {
+        Self(self.x() + rhs, self.y() + rhs, self.z() + rhs, self.w() + rhs)
+    }
+}
+impl_op!(f64, Tuple4, Add, add);
+
+impl Sub for Tuple4 {
+    type Output = Self;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(
+            self.x() - rhs.x(),
+            self.y() - rhs.y(),
+            self.z() - rhs.z(),
+            self.w() - rhs.w(),
+        )
+    }
+}
+impl_op!(Tuple4, Sub, sub);
+
+impl Sub<f64> for Tuple4 {
+    type Output = Self;
+
+    #[inline]
+    fn sub(self, rhs: f64) -> Self::Output {
+        Self(self.x() - rhs, self.y() - rhs, self.z() - rhs, self.w() - rhs)
+    }
+}
+impl_op!(f64, Tuple4, Sub, sub);
 
 impl Neg for Tuple4 {
     type Output = Self;
 
     #[inline]
-    fn neg(self) -> Self { Self(self.0.neg(), self.1.neg(), self.2.neg(), self.3.neg()) }
+    fn neg(self) -> Self { Self(self.x().neg(), self.y().neg(), self.z().neg(), self.w().neg()) }
 }
 
 impl Neg for &Tuple4 {
