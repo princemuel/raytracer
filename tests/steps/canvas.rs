@@ -7,7 +7,7 @@ use crate::support::world::TestWorld;
 // ===============================================================================
 // Given Steps - Canvas Construction
 // ===============================================================================
-#[given(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← canvas\(([-+]?\d+), ([-+]?\d+)\)$")]
+#[given(expr = r"{word} ← canvas\({int}, {int}\)")]
 fn given_canvas(world: &mut TestWorld, name: String, width: usize, height: usize) {
     world.insert(&name, Canvas::new(width, height));
 }
@@ -15,9 +15,7 @@ fn given_canvas(world: &mut TestWorld, name: String, width: usize, height: usize
 // ===============================================================================
 // When Steps -
 // ===============================================================================
-#[when(
-    regex = r"^write_pixel\(([a-zA-Z_][a-zA-Z0-9_]*), ([-+]?\d+), ([-+]?\d+), ([a-zA-Z_][a-zA-Z0-9_]*)\)$"
-)]
+#[when(expr = r"write_pixel\({word}, {int}, {int}, {word}\)")]
 fn when_write_pixel(world: &mut TestWorld, canvas: String, x: usize, y: usize, color: String) {
     let color = *world.get::<Color>(&color).unwrap();
     let canvas = world.get_mut::<Canvas>(&canvas).unwrap();
@@ -25,16 +23,14 @@ fn when_write_pixel(world: &mut TestWorld, canvas: String, x: usize, y: usize, c
     canvas.write_pixel(x, y, color);
 }
 
-#[when(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ← canvas_to_ppm\(([a-zA-Z_][a-zA-Z0-9_]*)\)$")]
+#[when(expr = r"{word} ← canvas_to_ppm\({word}\)")]
 fn when_canvas_to_ppm(world: &mut TestWorld, key: String, canvas: String) {
     let canvas = world.get::<Canvas>(&canvas).unwrap();
     let value = canvas.to_ppm();
     world.insert(&key, value);
 }
 
-#[when(
-    regex = r"^every pixel of ([a-zA-Z_][a-zA-Z0-9_]*) is set to color\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
-)]
+#[when(expr = r"every pixel of {word} is set to color\({float}, {float}, {float}\)")]
 fn when_pixel_is_color(world: &mut TestWorld, name: String, r: f64, g: f64, b: f64) {
     let canvas = world.get_mut::<Canvas>(&name).expect("Canvas not found");
     let color = color(r, g, b);
@@ -44,13 +40,13 @@ fn when_pixel_is_color(world: &mut TestWorld, name: String, r: f64, g: f64, b: f
 // ===============================================================================
 // Then Steps - Canvas Properties
 // ===============================================================================
-#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.width = ([-+]?\d+)$")]
+#[then(expr = "{word}.width = {int}")]
 fn then_width_equals(world: &mut TestWorld, name: String, expected: usize) {
     let canvas = world.get::<Canvas>(&name).unwrap();
     assert_eq!(canvas.width(), expected);
 }
 
-#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\.height = ([-+]?\d+)$")]
+#[then(expr = "{word}.height = {int}")]
 fn then_height_equals(world: &mut TestWorld, name: String, expected: usize) {
     let canvas = world.get::<Canvas>(&name).unwrap();
     assert_eq!(canvas.height(), expected);
@@ -59,9 +55,7 @@ fn then_height_equals(world: &mut TestWorld, name: String, expected: usize) {
 // ===============================================================================
 // Then Steps - Canvas Equality
 // ===============================================================================
-#[then(
-    regex = r"^pixel_at\(([a-zA-Z_][a-zA-Z0-9_]*), ([-+]?\d+), ([-+]?\d+)\) = ([a-zA-Z_][a-zA-Z0-9_]*)$"
-)]
+#[then(expr = r"pixel_at\({word}, {int}, {int}\) = {word}")]
 fn then_pixel_at_equals_color(world: &mut TestWorld, canvas: String, x: usize, y: usize, color: String) {
     let expected = *world.get::<Color>(&color).unwrap();
     let canvas = world.get::<Canvas>(&canvas).unwrap();
@@ -70,9 +64,7 @@ fn then_pixel_at_equals_color(world: &mut TestWorld, canvas: String, x: usize, y
     assert_eq!(actual, expected);
 }
 
-#[then(
-    regex = r"^every pixel of ([a-zA-Z_][a-zA-Z0-9_]*) is color\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
-)]
+#[then(expr = r"every pixel of {word} is color\({float}, {float}, {float}\)")]
 fn then_every_pixel_is_color(world: &mut TestWorld, canvas: String, r: f64, g: f64, b: f64) {
     let canvas = world.get::<Canvas>(&canvas).unwrap();
     let expected = color(r, g, b);
@@ -88,7 +80,7 @@ fn then_every_pixel_is_color(world: &mut TestWorld, canvas: String, r: f64, g: f
     }
 }
 
-#[then(regex = r"^lines ([-+]?\d+)-([-+]?\d+) of ([a-zA-Z_][a-zA-Z0-9_]*) are$")]
+#[then(expr = "lines {int}-{int} of {word} are")]
 fn then_lines_of_ppm_are(world: &mut TestWorld, step: &Step, start: usize, end: usize, name: String) {
     let ppm = world.get::<String>(&name).unwrap();
     let expected = step.docstring().expect("Expected docstring with PPM content");
@@ -101,7 +93,7 @@ fn then_lines_of_ppm_are(world: &mut TestWorld, step: &Step, start: usize, end: 
     }
 }
 
-#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) ends with a newline character$")]
+#[then(expr = "{word} ends with a newline character")]
 fn then_ppm_ends_with_newline(world: &mut TestWorld, name: String) {
     let ppm = world.get::<String>(&name).unwrap();
     assert!(
