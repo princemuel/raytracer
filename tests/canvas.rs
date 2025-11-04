@@ -1,20 +1,38 @@
+#![allow(incomplete_features)]
+#![feature(generic_const_exprs)]
+
+mod common;
+
 use cucumber::gherkin::Step;
-use cucumber::{given, then, when};
+use cucumber::{World as _, given, then, when};
 use raytracer::prelude::*;
 
-use crate::support::world::TestWorld;
+use crate::common::TestWorld;
 
-// ===============================================================================
+#[tokio::main]
+async fn main() {
+    TestWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit("tests/features/canvas.feature")
+        .await;
+}
+
+// ====================================================================
 // Given Steps - Canvas Construction
-// ===============================================================================
+// ====================================================================
 #[given(expr = r"{word} ← canvas\({int}, {int}\)")]
 fn given_canvas(world: &mut TestWorld, name: String, width: usize, height: usize) {
     world.insert(&name, Canvas::new(width, height));
 }
 
-// ===============================================================================
+#[given(expr = r"{word} ← color\({float}, {float}, {float}\)")]
+fn given_color(world: &mut TestWorld, name: String, r: f64, g: f64, b: f64) {
+    world.insert(&name, color(r, g, b));
+}
+
+// ====================================================================
 // When Steps -
-// ===============================================================================
+// ====================================================================
 #[when(expr = r"write_pixel\({word}, {int}, {int}, {word}\)")]
 fn when_write_pixel(world: &mut TestWorld, canvas: String, x: usize, y: usize, color: String) {
     let color = *world.get::<Color>(&color).unwrap();
@@ -37,9 +55,9 @@ fn when_pixel_is_color(world: &mut TestWorld, name: String, r: f64, g: f64, b: f
     canvas.pixels_mut().iter_mut().for_each(|pixel| *pixel = color);
 }
 
-// ===============================================================================
+// ====================================================================
 // Then Steps - Canvas Properties
-// ===============================================================================
+// ====================================================================
 #[then(expr = "{word}.width = {int}")]
 fn then_width_equals(world: &mut TestWorld, name: String, expected: usize) {
     let canvas = world.get::<Canvas>(&name).unwrap();
@@ -52,9 +70,9 @@ fn then_height_equals(world: &mut TestWorld, name: String, expected: usize) {
     assert_eq!(canvas.height(), expected);
 }
 
-// ===============================================================================
+// ====================================================================
 // Then Steps - Canvas Equality
-// ===============================================================================
+// ====================================================================
 #[then(expr = r"pixel_at\({word}, {int}, {int}\) = {word}")]
 fn then_pixel_at_equals_color(world: &mut TestWorld, canvas: String, x: usize, y: usize, color: String) {
     let expected = *world.get::<Color>(&color).unwrap();
