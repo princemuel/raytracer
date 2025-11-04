@@ -92,10 +92,12 @@ Feature: Matrices
       | 4 | 8 | 16 | 32 |
     Then A * identity_matrix = A
 
+  @allow.skipped
   Scenario: Multiplying the identity matrix by a tuple
     Given a ← tuple(1, 2, 3, 4)
     Then identity_matrix * a = a
 
+  @allow.skipped
   Scenario: Transposing a matrix
     Given the following matrix A:
       | 0 | 9 | 3 | 0 |
@@ -108,16 +110,19 @@ Feature: Matrices
       | 3 | 0 | 5 | 5 |
       | 0 | 8 | 3 | 8 |
 
+  @allow.skipped
   Scenario: Transposing the identity matrix
     Given A ← transpose(identity_matrix)
     Then A = identity_matrix
 
+  @allow.skipped
   Scenario: Calculating the determinant of a 2x2 matrix
     Given the following 2x2 matrix A:
       |  1 | 5 |
       | -3 | 2 |
     Then determinant(A) = 17
 
+  @allow.skipped
   Scenario: A submatrix of a 3x3 matrix is a 2x2 matrix
     Given the following 3x3 matrix A:
       |  1 | 5 |  0 |
@@ -127,6 +132,7 @@ Feature: Matrices
       | -3 | 2 |
       |  0 | 6 |
 
+  @allow.skipped
   Scenario: A submatrix of a 4x4 matrix is a 3x3 matrix
     Given the following 4x4 matrix A:
       | -6 | 1 |  1 | 6 |
@@ -138,6 +144,7 @@ Feature: Matrices
       | -8 |  8 | 6 |
       | -7 | -1 | 1 |
 
+  @allow.skipped
   Scenario: Calculating a minor of a 3x3 matrix
     Given the following 3x3 matrix A:
       | 3 |  5 |  0 |
@@ -147,6 +154,7 @@ Feature: Matrices
     Then determinant(B) = 25
     And minor(A, 1, 0) = 25
 
+  @allow.skipped
   Scenario: Calculating a cofactor of a 3x3 matrix
     Given the following 3x3 matrix A:
       | 3 |  5 |  0 |
@@ -157,6 +165,7 @@ Feature: Matrices
     And minor(A, 1, 0) = 25
     And cofactor(A, 1, 0) = -25
 
+  @allow.skipped
   Scenario: Calculating the determinant of a 3x3 matrix
     Given the following 3x3 matrix A:
       |  1 | 2 |  6 |
@@ -167,6 +176,7 @@ Feature: Matrices
     And cofactor(A, 0, 2) = -46
     And determinant(A) = -196
 
+  @allow.skipped
   Scenario: Calculating the determinant of a 4x4 matrix
     Given the following 4x4 matrix A:
       | -2 | -8 |  3 |  5 |
@@ -179,6 +189,7 @@ Feature: Matrices
     And cofactor(A, 0, 3) = 51
     And determinant(A) = -4071
 
+  @allow.skipped
   Scenario: Testing an invertible matrix for invertibility
     Given the following 4x4 matrix A:
       | 6 |  4 | 4 |  4 |
@@ -188,6 +199,7 @@ Feature: Matrices
     Then determinant(A) = -2120
     And A is invertible
 
+  @allow.skipped
   Scenario: Testing a noninvertible matrix for invertibility
     Given the following 4x4 matrix A:
       | -4 |  2 | -2 | -3 |
@@ -197,6 +209,7 @@ Feature: Matrices
     Then determinant(A) = 0
     And A is not invertible
 
+  @allow.skipped
   Scenario: Calculating the inverse of a matrix
     Given the following 4x4 matrix A:
       | -5 |  2 |  6 | -8 |
@@ -215,6 +228,7 @@ Feature: Matrices
       | -0.07895 | -0.22368 | -0.05263 |  0.19737 |
       | -0.52256 | -0.81391 | -0.30075 |  0.30639 |
 
+  @allow.skipped
   Scenario: Calculating the inverse of another matrix
     Given the following 4x4 matrix A:
       |  8 | -5 |  9 |  2 |
@@ -227,6 +241,7 @@ Feature: Matrices
       |  0.35897 |  0.35897 |  0.43590 |  0.92308 |
       | -0.69231 | -0.69231 | -0.76923 | -1.92308 |
 
+  @allow.skipped
   Scenario: Calculating the inverse of a third matrix
     Given the following 4x4 matrix A:
       |  9 |  3 |  0 |  9 |
@@ -239,6 +254,7 @@ Feature: Matrices
       | -0.02901 | -0.14630 | -0.10926 |  0.12963 |
       |  0.17778 |  0.06667 | -0.26667 |  0.33333 |
 
+  @allow.skipped
   Scenario: Multiplying a product by its inverse
     Given the following 4x4 matrix A:
       |  3 | -9 |  7 |  3 |

@@ -17,7 +17,7 @@ async fn main() {
 }
 
 // ====================================================================
-// Given Steps - Tuple, Vector, Point, Color Construction
+// Given Steps - Construction
 // ====================================================================
 #[given(expr = r"{word} ← tuple\({float}, {float}, {float}, {float}\)")]
 fn given_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64, w: f64) {
@@ -47,7 +47,7 @@ fn given_vector_sqrt2_half(world: &mut TestWorld, name: String, a: f64, b: f64, 
 }
 
 // ====================================================================
-// When Steps -
+// When Steps - State is true
 // ====================================================================
 #[when(expr = r"{word} ← normalize\({word}\)")]
 fn when_normalize(world: &mut TestWorld, key: String, name: String) {
@@ -71,7 +71,7 @@ fn when_reflect(world: &mut TestWorld, key: String, name: String, normal: String
 }
 
 // ====================================================================
-// Then Steps - Tuple Properties
+// Then Steps - Element Access
 // ====================================================================
 #[then(expr = "{word}.x = {float}")]
 fn then_x_equals(world: &mut TestWorld, name: String, expected: f64) {
@@ -116,7 +116,7 @@ fn then_blue_equals(world: &mut TestWorld, name: String, expected: f64) {
 }
 
 // ====================================================================
-// Then Steps - Tuple Type Checking
+// Then Steps - Type Checking
 // ====================================================================
 #[then(expr = "{word} is a point")]
 fn then_is_point(world: &mut TestWorld, name: String) {
@@ -145,9 +145,6 @@ fn then_is_not_vector(world: &mut TestWorld, name: String) {
 // ====================================================================
 // Then Steps - Equality
 // ====================================================================
-// ===============================================================================
-// Then Steps - Equality
-// ===============================================================================
 #[then(
     regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+), ([-+]?\d*\.?\d+)\)$"
 )]

@@ -1,14 +1,26 @@
+#![allow(incomplete_features)]
+#![feature(generic_const_exprs)]
+
+mod common;
+
 use cucumber::gherkin::Step;
-use cucumber::{given, then};
+use cucumber::{World as _, given, then};
 use raytracer::prelude::*;
 
-use crate::support::helpers::matrix::parse_matrix_table;
-use crate::support::world::TestWorld;
+use crate::common::{TestWorld, parse_matrix_table};
 
-// ===============================================================================
-// Given Steps - Matrix Construction
-// ===============================================================================
-#[given(regex = r"^the following ([-+]?\d+)x([-+]?\d+) matrix ([a-zA-Z_][a-zA-Z0-9_]*):$")]
+#[tokio::main]
+async fn main() {
+    TestWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit("tests/features/matrices.feature")
+        .await;
+}
+
+// ====================================================================
+// Given Steps - Construction
+// ====================================================================
+#[given(expr = r"the following {int}x{int} matrix {word}:")]
 fn given_matrix_with_dimensions(world: &mut TestWorld, step: &Step, rows: usize, cols: usize, key: String) {
     let table = step.table.clone().expect("Matrix data table is required");
     if rows != cols {
@@ -24,7 +36,7 @@ fn given_matrix_with_dimensions(world: &mut TestWorld, step: &Step, rows: usize,
     }
 }
 
-#[given(regex = r"^the following matrix ([a-zA-Z_][a-zA-Z0-9_]*):$")]
+#[given(expr = "the following matrix {word}:")]
 fn given_matrix(world: &mut TestWorld, step: &Step, key: String) {
     let table = step.table.clone().expect("Matrix data table is required");
 
@@ -43,9 +55,19 @@ fn given_matrix(world: &mut TestWorld, step: &Step, key: String) {
     }
 }
 
-// ===============================================================================
-// Then Steps - Matrix Element Access
-// ===============================================================================
+#[given(expr = "{word} ← transpose(identity_matrix)")]
+fn given_transposed_matrix(world: &mut TestWorld, key: String) {
+    world.insert(&key, Mat4::IDENTITY.transpose());
+}
+
+#[given(expr = r"{word} ← tuple\({float}, {float}, {float}, {float}\)")]
+fn given_tuple(world: &mut TestWorld, name: String, x: f64, y: f64, z: f64, w: f64) {
+    world.insert(&name, tuple(x, y, z, w));
+}
+
+// ====================================================================
+// Then Steps - Element Access
+// ====================================================================
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*)\[([-+]?\d+),([-+]?\d+)\] = ([-+]?\d*\.?\d+)$")]
 fn then_element_at_idx_is(world: &mut TestWorld, key: String, row: usize, col: usize, expected: f64) {
     let actual = {
@@ -66,9 +88,9 @@ fn then_element_at_idx_is(world: &mut TestWorld, key: String, row: usize, col: u
     );
 }
 
-// ===============================================================================
-// Then Steps - Matrix Equality
-// ===============================================================================
+// ====================================================================
+// Then Steps - Equality
+// ====================================================================
 
 #[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) = ([a-zA-Z_][a-zA-Z0-9_]*)$")]
 fn then_matrices_should_be_equal(world: &mut TestWorld, a: String, b: String) {
@@ -98,9 +120,10 @@ fn then_matrices_should_not_be_equal(world: &mut TestWorld, a: String, b: String
     }
 }
 
-#[then(
-    regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \* ([a-zA-Z_][a-zA-Z0-9_]*) is the following ([-+]?\d+)x([-+]?\d+) matrix:$"
-)]
+// ====================================================================
+// Then Steps - Operations
+// ====================================================================
+#[then(expr = "{word} * {word} is the following {int}x{int} matrix:")]
 fn then_matrix_product_should_be(
     world: &mut TestWorld,
     step: &Step,
@@ -153,39 +176,40 @@ fn then_matrix_product_should_be(
     }
 }
 // A * identity_matrix = A
-#[then(regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \* identity_matrix = ([a-zA-Z_][a-zA-Z0-9_]*)$")]
-fn then_matrix_product_identity_should_be(world: &mut TestWorld, key: String, key2: String) {
-    if let (Some(matrix), Some(expected)) = (world.get::<Mat4>(&key), world.get::<Mat4>(&key2)) {
+#[then(expr = "{word} * identity_matrix = A")]
+fn then_matrix_product_identity_should_be(world: &mut TestWorld, key: String) {
+    if let Some(matrix) = world.get::<Mat4>(&key) {
+        let expected = *matrix;
         let actual = matrix * Mat4::IDENTITY;
-        return assert_eq!(actual, *expected,);
+        return assert_eq!(actual, expected);
     }
 
-    if let (Some(matrix), Some(expected)) = (world.get::<Mat3>(&key), world.get::<Mat3>(&key2)) {
+    if let Some(matrix) = world.get::<Mat3>(&key) {
+        let expected = *matrix;
         let actual = matrix * Mat3::IDENTITY;
-        return assert_eq!(actual, *expected,);
+        return assert_eq!(actual, expected);
     }
 
-    if let (Some(matrix), Some(expected)) = (world.get::<Mat2>(&key), world.get::<Mat2>(&key2)) {
+    if let Some(matrix) = world.get::<Mat2>(&key) {
+        let expected = *matrix;
         let actual = matrix * Mat2::IDENTITY;
-        assert_eq!(actual, *expected,)
+        assert_eq!(actual, expected)
     }
 }
 
 // A * b = tuple(18, 24, 33, 1)
-#[then(
-    regex = r"^([a-zA-Z_][a-zA-Z0-9_]*) \* ([a-zA-Z_][a-zA-Z0-9_]*) = tuple\(([^,]+), ([^,]+), ([^,]+), ([^)]+)\)$"
-)]
+#[then(expr = r"{word} * {word} = tuple\({float}, {float}, {float}, {float}\)")]
 fn then_matrix_identity_mul_tuple_should_be(
     world: &mut TestWorld,
-    key: String,
-    key2: String,
+    a: String,
+    b: String,
     x: f64,
     y: f64,
     z: f64,
     w: f64,
 ) {
     let expected = tuple(x, y, z, w);
-    let tup = world.get::<Tuple4>(&key2).unwrap();
+    let tup = world.get::<Tuple4>(&b).unwrap();
 
     let actual = {
         let get = |world: &TestWorld, key: &String| -> Option<Tuple4> {
@@ -196,8 +220,60 @@ fn then_matrix_identity_mul_tuple_should_be(
                 .or_else(|| world.get::<Mat4>(key).map(|matrix| matrix * tup))
         };
 
-        get(world, &key).unwrap_or(Tuple4::ZERO)
+        get(world, &a).unwrap_or(Tuple4::ZERO)
     };
 
     assert_eq!(actual, expected);
+}
+
+// identity_matrix * a = a
+#[then(expr = "identity_matrix * {word} = a")]
+fn then_identity_matrix_mul_tuple_should_be(world: &mut TestWorld, key: String) {
+    let expected = *world.get::<Tuple4>(&key).unwrap();
+    let actual = Mat4::IDENTITY * expected;
+
+    assert_eq!(actual, expected);
+}
+
+#[then(expr = r"transpose\({word}\) is the following matrix:")]
+fn transposed_identity_matrix_is(world: &mut TestWorld, step: &Step, key: String) {
+    let table = step.table.clone().expect("Matrix data table is required");
+    let buffer = parse_matrix_table(&table);
+
+    if let Some(matrix) = world.get::<Mat4>(&key) {
+        let expected = Matrix::try_from(&buffer[..]).unwrap();
+        let actual = matrix.transpose();
+        return assert_eq!(actual, expected);
+    }
+
+    if let Some(matrix) = world.get::<Mat3>(&key) {
+        let expected = Matrix::try_from(&buffer[..]).unwrap();
+        let actual = matrix.transpose();
+        return assert_eq!(actual, expected);
+    }
+
+    if let Some(matrix) = world.get::<Mat2>(&key) {
+        let expected = Matrix::try_from(&buffer[..]).unwrap();
+        let actual = matrix.transpose();
+        assert_eq!(actual, expected)
+    }
+}
+
+#[then(expr = "{word} = identity_matrix")]
+fn is_transposed_identity_matrix(world: &mut TestWorld, key: String) {
+    if let Some(matrix) = world.get::<Mat4>(&key) {
+        let expected = Mat4::IDENTITY;
+        let actual = *matrix;
+        return assert_eq!(actual, expected);
+    }
+    if let Some(matrix) = world.get::<Mat3>(&key) {
+        let expected = Mat3::IDENTITY;
+        let actual = *matrix;
+        return assert_eq!(actual, expected);
+    }
+    if let Some(matrix) = world.get::<Mat2>(&key) {
+        let expected = Mat2::IDENTITY;
+        let actual = *matrix;
+        assert_eq!(actual, expected);
+    }
 }
