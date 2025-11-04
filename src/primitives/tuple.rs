@@ -289,22 +289,19 @@ impl IndexMut<usize> for Tuple4 {
 
 impl core::fmt::Display for Tuple4 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        if let Some(p) = f.precision() {
-            write!(
-                f,
-                "[{:.*}, {:.*}, {:.*}, {:.*}]",
-                p,
-                self.x(),
-                p,
-                self.y(),
-                p,
-                self.z(),
-                p,
-                self.w()
-            )
-        } else {
-            write!(f, "[{}, {}, {}, {}]", self.x(), self.y(), self.z(), self.w())
-        }
+        let p = f.precision().unwrap_or(3);
+        write!(
+            f,
+            "[{:.*}, {:.*}, {:.*}, {:.*}]",
+            p,
+            self.x(),
+            p,
+            self.y(),
+            p,
+            self.z(),
+            p,
+            self.w()
+        )
     }
 }
 

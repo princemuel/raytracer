@@ -259,10 +259,25 @@ where
     type Output = Tuple4;
 
     fn mul(self, rhs: Tuple4) -> Self::Output {
-        let v = [rhs.x(), rhs.y(), rhs.z(), rhs.w()];
         // !NOTE: This currently only works for 4x4 matrices (0..N == 4)
+        // let v = [rhs.x(), rhs.y(), rhs.z(), rhs.w()];
+        let v: [f64; 4] = rhs.into();
         let result: [f64; 4] =
-            core::array::from_fn(|row| (0..N).map(|col| self[(row, col)] * v[col]).sum());
+            core::array::from_fn(|row| (0..N.min(4)).map(|col| self[(row, col)] * v[col]).sum());
+
+        // let mut result = [0.0; 4];
+
+        // // Only compute as many rows as we have (up to 4)
+        // let rows = N.min(4);
+        // let cols = N.min(4);
+
+        // for row in 0..rows {
+        //     let mut sum = 0.0;
+        //     for col in 0..cols {
+        //         sum += self[(row, col)] * v[col];
+        //     }
+        //     result[row] = sum;
+        // }
 
         Tuple4::from(result)
     }
@@ -377,30 +392,17 @@ mod matrices {
         fn minor(&self, row: usize, col: usize) -> f64;
     }
 
-    trait Cofactor {
+    pub const trait Cofactor {
         fn cofactor(&self, row: usize, col: usize) -> f64;
     }
 
-    pub trait Inverse: Sized {
+    pub const trait Inverse: Sized {
         type Output;
 
         fn invertible(&self) -> bool;
         fn inverse(&self) -> Option<Self::Output>;
         // fn inverse(&self) -> Option<Self>;
     }
-
-    // pub trait DefinedMatrix<const N: usize>
-    // where
-    //     [(); N * N]: Sized,
-    // {
-    //     fn identity() -> Matrix<N> {
-    //         let mut matrix = Matrix::<N>::new();
-    //         for i in 0..N {
-    //             matrix[i][i] = 1.0;
-    //         }
-    //         matrix
-    //     }
-    // }
 
     pub type Mat2 = Matrix<2>;
 
