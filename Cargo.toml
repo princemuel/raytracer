@@ -1,59 +1,47 @@
 [package]
-  name = "raytracer"
-  version = "0.1.0"
-  authors = ["Prince Muel <68931805+princemuel@users.noreply.github.com>"]
-  edition = "2024"
+authors = ["Prince Muel <68931805+princemuel@users.noreply.github.com>"]
+edition = "2024"
+name    = "raytracer"
+version = "0.1.0"
 
-  readme = "README.md"
-  license = "MIT"
+license = "MIT"
+readme  = "README.md"
 
-  homepage = "https://github.com/princemuel/raytracer#readme"
-  repository = "https://github.com/princemuel/raytracer"
-  # documentation = "https://docs.rs/raytracer/"
+homepage   = "https://github.com/princemuel/raytracer#readme"
+repository = "https://github.com/princemuel/raytracer"
+# documentation = "https://docs.rs/raytracer/"
 
-  description = "A Ray Tracer library implementation of the Ray Tracer Challenge book by Jamis Buck."
+description = "A Ray Tracer library implementation of the Ray Tracer Challenge book by Jamis Buck."
 
-  keywords = ["api", "rest", "http", "exercism"]
-  categories = ["api-bindings", "asynchronous"]
+categories = ["api-bindings", "asynchronous"]
+keywords   = ["api", "rest", "http", "exercism"]
 
-  include = ["src/**/*", "tests/**/*", "LICENSE", "README.md"]
+include = ["src/**/*", "tests/**/*", "LICENSE", "README.md"]
 
   [package.metadata.docs.rs]
-    all-features = true
-    targets = ["x86_64-unknown-linux-gnu"]
-    rustc-args = ["--cfg", "docsrs"]
+  all-features = true
+  rustc-args   = ["--cfg", "docsrs"]
+  targets      = ["x86_64-unknown-linux-gnu"]
 
 [lints.rust.unexpected_cfgs]
-  level = "warn"
-  check-cfg = [
-    "cfg(tarpaulin)",
-    "cfg(tarpaulin_include)",
-    "cfg(coverage)",
-    "cfg(coverage_nightly)",
-    "cfg(mini_exercism_enable_tests_with_real_endpoints)",
-  ]
+check-cfg = [
+  "cfg(tarpaulin)",
+  "cfg(tarpaulin_include)",
+  "cfg(coverage)",
+  "cfg(coverage_nightly)",
+  "cfg(mini_exercism_enable_tests_with_real_endpoints)",
+]
+level = "warn"
 
 [dev-dependencies]
-  cucumber = "0.21"
-  derive_more = { version = "2", features = ["full"] }
-  tokio = { version = "1", features = [
-    "rt",
-    "rt-multi-thread",
-    "macros",
-    "test-util",
-  ] }
-
-[[test]]
-  name = "tuples"
-  harness = false
-
-[[test]]
-  name = "matrices"
-  harness = false
-
-[[test]]
-  name = "canvas"
-  harness = false
+proptest = "1"
 
 [dependencies]
-  libm = "0.2"
+libm = "0.2"
+
+
+[profile.test.package.proptest]
+opt-level = 3
+
+[profile.test.package.rand_chacha]
+opt-level = 3
