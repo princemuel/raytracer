@@ -4,7 +4,7 @@
 
 A **ray tracer project implemented in Rust**. It is inspired by [_The Ray Tracer Challenge_][rtc-challenge] by Jamis Buck. The book provides pseudocode and test cases; the implementation is left to the reader.
 
-[ci-badge]: https://github.com/princemuel/raytracer/actions/workflows/rust-ci.yml/badge.svg
+[ci-badge]: https://github.com/princemuel/raytracer/actions/workflows/ci.yml/badge.svg
 [rtc-challenge]: http://raytracerchallenge.com/
 
 ## Table of Contents
@@ -23,8 +23,8 @@ A **ray tracer project implemented in Rust**. It is inspired by [_The Ray Tracer
 
 This project serves two purposes:
 
-- **Showcase**: demonstrate progress in building a ray tracer step by step.
-- **Learning log**: capture insights about Rust, graphics programming, and math along the way.
+- **Showcase**: to demonstrate my progress in building a ray tracer step by step.
+- **Learning Log**: to capture insights about Rust, graphics programming, and math along the way.
 
 ## What is Ray Tracing?
 
@@ -35,7 +35,7 @@ It’s powerful for accuracy but computationally expensive.
 
 ## Features
 
-- [ ] Chapter 01: fjfjjfjf
+- [ ] Chapter 01: ???
 
 ## How to run this project
 
