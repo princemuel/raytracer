@@ -115,7 +115,12 @@ impl Mul<f64> for Tuple4 {
 
     #[inline]
     fn mul(self, rhs: f64) -> Self::Output {
-        Self(self.x() * rhs, self.y() * rhs, self.z() * rhs, self.w() * rhs)
+        Self(
+            self.x() * rhs,
+            self.y() * rhs,
+            self.z() * rhs,
+            self.w() * rhs,
+        )
     }
 }
 impl_op!(f64, Tuple4, Mul, mul);
@@ -140,7 +145,12 @@ impl Div<f64> for Tuple4 {
 
     #[inline]
     fn div(self, rhs: f64) -> Self::Output {
-        Self(self.x() / rhs, self.y() / rhs, self.z() / rhs, self.w() / rhs)
+        Self(
+            self.x() / rhs,
+            self.y() / rhs,
+            self.z() / rhs,
+            self.w() / rhs,
+        )
     }
 }
 impl_op!(f64, Tuple4, Div, div);
@@ -165,7 +175,12 @@ impl Add<f64> for Tuple4 {
 
     #[inline]
     fn add(self, rhs: f64) -> Self::Output {
-        Self(self.x() + rhs, self.y() + rhs, self.z() + rhs, self.w() + rhs)
+        Self(
+            self.x() + rhs,
+            self.y() + rhs,
+            self.z() + rhs,
+            self.w() + rhs,
+        )
     }
 }
 impl_op!(f64, Tuple4, Add, add);
@@ -190,7 +205,12 @@ impl Sub<f64> for Tuple4 {
 
     #[inline]
     fn sub(self, rhs: f64) -> Self::Output {
-        Self(self.x() - rhs, self.y() - rhs, self.z() - rhs, self.w() - rhs)
+        Self(
+            self.x() - rhs,
+            self.y() - rhs,
+            self.z() - rhs,
+            self.w() - rhs,
+        )
     }
 }
 impl_op!(f64, Tuple4, Sub, sub);
@@ -199,7 +219,14 @@ impl Neg for Tuple4 {
     type Output = Self;
 
     #[inline]
-    fn neg(self) -> Self { Self(self.x().neg(), self.y().neg(), self.z().neg(), self.w().neg()) }
+    fn neg(self) -> Self {
+        Self(
+            self.x().neg(),
+            self.y().neg(),
+            self.z().neg(),
+            self.w().neg(),
+        )
+    }
 }
 
 impl Neg for &Tuple4 {
@@ -292,14 +319,10 @@ impl core::fmt::Display for Tuple4 {
         let p = f.precision().unwrap_or(3);
         write!(
             f,
-            "[{:.*}, {:.*}, {:.*}, {:.*}]",
-            p,
+            "[{:.p$}, {:.p$}, {:.p$}, {:.p$}]",
             self.x(),
-            p,
             self.y(),
-            p,
             self.z(),
-            p,
             self.w()
         )
     }
@@ -339,4 +362,66 @@ impl From<(f64, f64, f64, f64)> for Tuple4 {
 impl From<Tuple4> for (f64, f64, f64, f64) {
     #[inline]
     fn from(v: Tuple4) -> Self { (v.0, v.1, v.2, v.3) }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn tuple_with_w_1_is_a_point() {
+        let a = tuple(4.3, -4.2, 3.1, 1.0);
+
+        assert_eq!(a.x(), 4.3);
+        assert_eq!(a.y(), -4.2);
+        assert_eq!(a.z(), 3.1);
+        assert_eq!(a.w(), 1.0);
+        assert!(a.is_point());
+        assert!(!a.is_vector());
+    }
+
+    #[test]
+    fn tuple_with_w_0_is_a_vector() {
+        let a = tuple(4.3, -4.2, 3.1, 0.0);
+
+        assert_eq!(a.x(), 4.3);
+        assert_eq!(a.y(), -4.2);
+        assert_eq!(a.z(), 3.1);
+        assert_eq!(a.w(), 0.0);
+        assert!(!a.is_point());
+        assert!(a.is_vector());
+    }
+
+    #[test]
+    fn adding_two_tuples() {
+        let a1 = tuple(3, -2, 5, 1);
+        let a2 = tuple(-2, 3, 1, 0);
+
+        assert_eq!(a1 + a2, tuple(1, 1, 6, 1));
+    }
+
+    #[test]
+    fn negating_a_tuple() {
+        let a = tuple(1, -2, 3, -4);
+        assert_eq!(-a, tuple(-1, 2, -3, 4));
+    }
+
+    #[test]
+    fn multiplying_tuple_by_scalar() {
+        let a = tuple(1, -2, 3, -4);
+
+        assert_eq!(a * 3.5, tuple(3.5, -7.0, 10.5, -14.0));
+    }
+
+    #[test]
+    fn multiplying_tuple_by_fraction() {
+        let a = tuple(1, -2, 3, -4);
+        assert_eq!(a * 0.5, tuple(0.5, -1.0, 1.5, -2.0));
+    }
+
+    #[test]
+    fn dividing_tuple_by_scalar() {
+        let a = tuple(1, -2, 3, -4);
+        assert_eq!(a / 2.0, tuple(0.5, -1.0, 1.5, -2.0));
+    }
 }

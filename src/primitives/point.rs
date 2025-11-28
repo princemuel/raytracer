@@ -174,6 +174,45 @@ impl TryFrom<&Tuple4> for Point3 {
 impl core::fmt::Display for Point3 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let p = f.precision().unwrap_or(3);
-        write!(f, "[{:.*}, {:.*}, {:.*}]", p, self.x(), p, self.y(), p, self.z())
+        write!(f, "[{:.p$}, {:.p$}, {:.p$}]", self.x(), self.y(), self.z())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::primitives::{tuple, vector};
+
+    #[test]
+    fn point_creates_tuple_with_w_1() {
+        let p = point(4, -4, 3);
+        let t = tuple(4, -4, 3, 1);
+
+        let p: Tuple4 = p.into();
+        assert_eq!(p, t);
+    }
+
+    #[test]
+    fn subtracting_two_points_gives_vector() {
+        let p1 = point(3, 2, 1);
+        let p2 = point(5, 6, 7);
+
+        assert_eq!(p1 - p2, vector(-2, -4, -6));
+    }
+
+    #[test]
+    fn subtracting_vector_from_point_gives_point() {
+        let p = point(3, 2, 1);
+        let v = vector(5, 6, 7);
+
+        assert_eq!(p - v, point(-2, -4, -6));
+    }
+
+    #[test]
+    fn adding_vector_to_point_gives_point() {
+        let p = point(3, 2, 1);
+        let v = vector(5, 6, 7);
+
+        assert_eq!(p + v, point(8, 8, 8));
     }
 }

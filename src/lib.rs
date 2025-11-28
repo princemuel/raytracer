@@ -26,4 +26,4 @@ pub mod shading;
 pub mod world;
 // Re-export at crate root for convenience
 pub use error::TracerError;
-pub use prelude::Result;
+// pub use prelude::Result;

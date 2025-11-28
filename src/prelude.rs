@@ -29,7 +29,7 @@ pub use crate::primitives::{Color3, Point3, Vec3, Tuple4};
 
 #[rustfmt::skip]
 // Re-export fundamental traits
-pub use crate::primitives::{ColorRGB, Tuple,};
+pub use crate::primitives::{ColorRGB, Tuple,Cofactor, Determinant,   Minor, Submatrix};
 
 #[rustfmt::skip]
 // Re-export constructor functions
@@ -72,8 +72,8 @@ pub type Vector = Vec3;
 /// Convenience alias for RGB color
 pub type Color = Color3;
 
-/// Convenient Result type alias
-pub type Result<T> = core::result::Result<T, TracerError>;
+// Convenient Result type alias
+// pub type Result<T> = core::result::Result<T, TracerError>;
 
 // ================================
 // Debug & Visualization Helpers
@@ -84,6 +84,12 @@ pub mod debug {
     use super::*;
     /// Print a 3D coordinate with nice formatting
     pub fn print_coord(name: &str, point: Point3) {
-        println!("{}: ({:.3}, {:.3}, {:.3})", name, point.x(), point.y(), point.z());
+        println!(
+            "{}: ({:.3}, {:.3}, {:.3})",
+            name,
+            point.x(),
+            point.y(),
+            point.z()
+        );
     }
 }

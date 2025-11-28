@@ -20,13 +20,13 @@ pub const fn is_equal(a: f64, b: f64) -> bool {
     let diff = math::abs(a - b);
 
     // For very small numbers near zero, use absolute epsilon
-    if math::max(a, math::abs(b)) < 1.0 {
+    if math::max(math::abs(a), math::abs(b)) < 1.0 {
         return diff < EPSILON;
     }
 
     // For larger numbers, use relative epsilon to maintain precision
     // This prevents issues when comparing large coordinate values
-    let relative_epsilon = EPSILON * math::max(a, math::abs(b));
+    let relative_epsilon = EPSILON * math::max(math::abs(a), math::abs(b));
 
     // Use the larger of absolute and relative epsilon
     // This handles edge cases around 1.0 and ensures consistent behavior

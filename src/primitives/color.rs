@@ -1,7 +1,6 @@
 use core::ops::{Add, Mul, Sub};
 
 use crate::cmp::float::is_equal;
-
 /// Creates a color
 #[inline]
 pub fn color<R, G, B>(r: R, g: G, b: B) -> Color3
@@ -180,7 +179,7 @@ impl From<Color3> for [u8; 3] {
 impl core::fmt::Display for Color3 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let p = f.precision().unwrap_or(3);
-        write!(f, "[{:.*}, {:.*}, {:.*}]", p, self.r(), p, self.g(), p, self.b())
+        write!(f, "[{:.p$}, {:.p$}, {:.p$}]", self.r(), self.g(), self.b())
     }
 }
 
@@ -189,35 +188,46 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_color_constructor() {
-        let c1 = color(-0.5, 0.4, 1.7);
+    fn colors_are_rgb_tuples() {
+        let c = color(-0.5, 0.4, 1.7);
 
-        assert_eq!(c1.r(), -0.5);
-        assert_eq!(c1.g(), 0.4);
-        assert_eq!(c1.b(), 1.7);
+        assert_eq!(c.r(), -0.5);
+        assert_eq!(c.g(), 0.4);
+        assert_eq!(c.b(), 1.7);
     }
 
     #[test]
-    fn test_can_be_muliplied_by_a_scalar() {
-        let c1 = color(0.2, 0.3, 0.4);
+    fn adding_colors() {
+        let a = color(0.9, 0.6, 0.75);
+        let b = color(0.7, 0.1, 0.25);
 
-        let actual = c1 * 2.0;
-        let expected = color(0.4, 0.6, 0.8);
-        assert_eq!(actual, expected);
+        assert_eq!(a + b, color(1.6, 0.7, 1.0));
     }
 
     #[test]
-    fn test_can_be_muliplied_with_each_other() {
-        let c1 = color(1.0, 0.2, 0.4);
-        let c2 = color(0.9, 1.0, 0.2);
+    fn subtracting_colors() {
+        let a = color(0.9, 0.6, 0.75);
+        let b = color(0.7, 0.1, 0.25);
 
-        let actual = c1 * c2;
-        let expected = color(0.9, 0.2, 0.08);
-        assert_eq!(actual, expected);
+        assert_eq!(a - b, color(0.2, 0.5, 0.5));
     }
 
     #[test]
-    fn test_round_trip_rgb_conversion() {
+    fn multiplying_color_by_scalar() {
+        let c = color(0.2, 0.3, 0.4);
+        assert_eq!(c * 2.0, color(0.4, 0.6, 0.8));
+    }
+
+    #[test]
+    fn multiplying_colors() {
+        let a = color(1, 0.2, 0.4);
+        let b = color(0.9, 1, 0.1);
+
+        assert_eq!(a * b, color(0.9, 0.2, 0.04));
+    }
+
+    #[test]
+    fn round_trip_rgb_conversion() {
         for r in 0..=255u8 {
             for g in [0, 64, 128, 192, 255] {
                 for b in [0, 127, 255] {

@@ -56,7 +56,10 @@ impl Canvas {
             let mut current_line_len = 0;
 
             for rgb_values in pixel_row.iter().map(|&color| <[u8; 3]>::from(color)) {
-                for component_str in rgb_values.into_iter().map(|component| component.to_string()) {
+                for component_str in rgb_values
+                    .into_iter()
+                    .map(|component| component.to_string())
+                {
                     let separator = if current_line_len == 0 { "" } else { " " };
 
                     // Enforce 70-char line limit (PPM spec requirement)
@@ -109,14 +112,14 @@ mod tests {
     use crate::prelude::color;
 
     #[test]
-    fn test_canvas_constructor_sets_height_and_width() {
+    fn canvas_constructor_sets_height_and_width() {
         let canvas1 = Canvas::new(10, 20);
         assert_eq!(canvas1.width, 10);
         assert_eq!(canvas1.height, 20);
     }
 
     #[test]
-    fn test_canvas_constructor_sets_all_pixels_to_black() {
+    fn canvas_constructor_sets_all_pixels_to_black() {
         let canvas1 = Canvas::new(4, 6);
 
         for x in 0..3 {
@@ -127,7 +130,7 @@ mod tests {
     }
 
     #[test]
-    fn test_pixels_can_be_written_to_a_canvas() {
+    fn pixels_can_be_written_to_a_canvas() {
         let mut canvas1 = Canvas::new(10, 20);
         let color1 = color(1.0, 0.0, 0.0);
 

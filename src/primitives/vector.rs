@@ -114,6 +114,12 @@ impl Vec3 {
     }
 
     /// Computes the length of `self`.
+    /// ```
+    /// use raytracer::prelude::vector;
+    ///
+    /// let v = vector(3, 4, 0);
+    /// assert_eq!(v.length(), 5.0);
+    /// ```
     #[doc(alias = "magnitude")]
     #[inline]
     #[must_use]
@@ -183,11 +189,7 @@ impl Vec3 {
     #[must_use]
     pub fn normalize_or(self, fallback: Self) -> Self {
         let len = self.length();
-        if len.is_finite() && len >= EPSILON {
-            self * len.recip()
-        } else {
-            fallback
-        }
+        if len.is_finite() && len >= EPSILON { self * len.recip() } else { fallback }
     }
 
     /// Returns `self` normalized to length 1.0 if possible, else returns zero.
@@ -441,7 +443,7 @@ impl IndexMut<usize> for Vec3 {
 impl core::fmt::Display for Vec3 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let p = f.precision().unwrap_or(3);
-        write!(f, "[{:.*}, {:.*}, {:.*}]", p, self.x(), p, self.y(), p, self.z())
+        write!(f, "[{:.p$}, {:.p$}, {:.p$}]", self.x(), self.y(), self.z())
     }
 }
 
@@ -504,157 +506,249 @@ impl TryFrom<&Tuple4> for Vec3 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::primitives::tuple;
 
     #[test]
-    fn test_equality_is_exact() {
-        let t1 = Vec3::new(1.0, 2.0, 3.0);
-        let t2 = Vec3::new(1.0, 2.0, 3.0);
-        assert_eq!(t1, t2);
+    fn equality_is_exact() {
+        let a = Vec3::new(1.0, 2.0, 3.0);
+        let b = Vec3::new(1.0, 2.0, 3.0);
+        assert_eq!(a, b);
     }
 
     #[test]
-    fn test_equality_is_inside_epsilon_range() {
-        let t1 = Vec3::new(1.0, 2.0, 3.0);
-        let t2 = Vec3::new(1.0000005, 2.0000001, 2.9999999);
-        assert_eq!(t1, t2);
+    fn equality_is_inside_epsilon_range() {
+        let a = Vec3::new(1.0, 2.0, 3.0);
+        let b = Vec3::new(1.0000005, 2.0000001, 2.9999999);
+        assert_eq!(a, b);
     }
 
     #[test]
-    fn test_inequality_is_outside_epsilon_range() {
-        let t1 = Vec3::new(1.0, 2.0, 3.0);
-        let t2 = Vec3::new(1.0001, 2.0, 3.0);
-        assert_ne!(t1, t2);
+    fn inequality_is_outside_epsilon_range() {
+        let a = Vec3::new(1.0, 2.0, 3.0);
+        let b = Vec3::new(1.0001, 2.0, 3.0);
+        assert_ne!(a, b);
     }
 
     #[test]
-    fn test_equality_with_epsilon_edge_case() {
+    fn equality_with_epsilon_edge_case() {
         let epsilon = 1e-5;
 
-        let t1 = Vec3::new(1.0, 2.0, 3.0);
-        let t2 = Vec3::new(1.0 + epsilon * 0.9, 2.0, 3.0);
-        assert_eq!(t1, t2);
+        let a = Vec3::new(1.0, 2.0, 3.0);
+        let b = Vec3::new(1.0 + epsilon * 0.9, 2.0, 3.0);
+        assert_eq!(a, b);
 
         let t3 = Vec3::new(1.0 + epsilon * 1.1, 2.0, 3.0);
-        assert_ne!(t1, t3);
+        assert_ne!(a, t3);
     }
 
     #[test]
-    fn test_magnitude_positive_nonunit() {
-        let t1 = vector(1.0, 2.0, 3.0);
-        assert_eq!(t1.length(), 14.0_f64.sqrt());
+    fn vector_creates_tuple_with_w_0() {
+        let v = vector(4, -4, 3);
+        let t = tuple(4, -4, 3, 0);
+
+        // Convert vector to tuple for comparison
+        let v_tuple: Tuple4 = v.into();
+        assert_eq!(v_tuple, t);
     }
 
     #[test]
-    fn test_magnitude_negative_nonunit() {
-        let t1 = vector(-1.0, -2.0, -3.0);
-        assert_eq!(t1.length(), 14.0_f64.sqrt());
+    fn subtracting_two_vectors() {
+        let v1 = vector(3, 2, 1);
+        let v2 = vector(5, 6, 7);
+
+        assert_eq!(v1 - v2, vector(-2, -4, -6));
     }
 
     #[test]
-    fn test_magnitude_squared_avoids_sqrt() {
+    fn subtracting_vector_from_zero_vector() {
+        let zero = vector(0, 0, 0);
+        let v = vector(1, -2, 3);
+
+        assert_eq!(zero - v, vector(-1, 2, -3));
+    }
+
+    #[test]
+    fn magnitude_of_unit_vector_x() {
+        let v = vector(1, 0, 0);
+        assert_eq!(v.length(), 1.0);
+    }
+
+    #[test]
+    fn magnitude_of_unit_vector_y() {
+        let v = vector(0, 1, 0);
+        assert_eq!(v.length(), 1.0);
+    }
+
+    #[test]
+    fn magnitude_of_unit_vector_z() {
+        let v = vector(0, 0, 1);
+        assert_eq!(v.length(), 1.0);
+    }
+
+    #[test]
+    fn magnitude_of_vector_1_2_3() {
+        let v = vector(1, 2, 3);
+        assert_eq!(v.length(), 14.0_f64.sqrt());
+    }
+
+    #[test]
+    fn magnitude_of_negative_vector() {
+        let v = vector(-1, -2, -3);
+        assert_eq!(v.length(), 14.0_f64.sqrt());
+    }
+
+    #[test]
+    fn magnitude_positive_nonunit() {
+        let a = vector(1.0, 2.0, 3.0);
+        assert_eq!(a.length(), 14.0_f64.sqrt());
+    }
+
+    #[test]
+    fn magnitude_negative_nonunit() {
+        let a = vector(-1.0, -2.0, -3.0);
+        assert_eq!(a.length(), 14.0_f64.sqrt());
+    }
+
+    #[test]
+    fn magnitude_squared_avoids_sqrt() {
         let v = Vec3::new(3.0, 4.0, 0.0);
         assert_eq!(v.length_squared(), 25.0);
         // Cucumber doesn't test this optimization
     }
 
     #[test]
-    fn test_zero_magnitude_is_zero() {
+    fn zero_magnitude_is_zero() {
         let v = vector(0.0, 0.0, 0.0);
         assert_eq!(v.length(), 0.0);
     }
 
     #[test]
-    fn test_normalize_simple_vector() {
-        let t1 = vector(4.0, 0.0, 0.0);
-        assert_eq!(t1.normalize(), vector(1.0, 0.0, 0.0));
+    fn normalize_simple_vector() {
+        let a = vector(4, 0, 0);
+        assert_eq!(a.normalize(), vector(1, 0, 0));
     }
 
     #[test]
-    fn test_normalize_non_simple_vector() {
-        let t1 = vector(1.0, 2.0, 3.0);
-        let expected_vector = vector(1.0 / 14_f64.sqrt(), 2.0 / 14_f64.sqrt(), 3.0 / 14_f64.sqrt());
-        assert_eq!(t1.try_normalize(), Some(expected_vector));
+    fn normalizing_vector_1_2_3() {
+        let v = vector(1, 2, 3);
+        let normalized = v.normalize();
+        let sqrt_14 = 14.0_f64.sqrt();
+        let expected = vector(1.0 / sqrt_14, 2.0 / sqrt_14, 3.0 / sqrt_14);
+
+        assert_eq!(normalized, expected);
     }
 
     #[test]
-    fn test_try_normalize_zero_vector_is_none() {
+    fn magnitude_of_normalized_vector_is_1() {
+        let v = vector(1, 2, 3);
+        let norm = v.normalize();
+
+        // Should be 1.0, but account for floating point precision
+        assert!((norm.length() - 1.0).abs() < 1e-10);
+    }
+
+    #[test]
+    fn normalize_non_simple_vector() {
+        let a = vector(1.0, 2.0, 3.0);
+        let expected_vector = vector(
+            1.0 / 14_f64.sqrt(),
+            2.0 / 14_f64.sqrt(),
+            3.0 / 14_f64.sqrt(),
+        );
+        assert_eq!(a.try_normalize(), Some(expected_vector));
+    }
+
+    #[test]
+    fn try_normalize_zero_vector_is_none() {
         assert_eq!(Vec3::ZERO.try_normalize(), None);
     }
 
     #[test]
-    fn test_try_normalize_tiny_vector_is_none() {
+    fn try_normalize_tiny_vector_is_none() {
         // Very small nonzero vector — should also be treated as zero for normalization
         // purposes.
-        let t1 = Vec3::new(1e-40, 1e-40, 1e-40);
-        assert_eq!(t1.try_normalize(), None);
+        let a = Vec3::new(1e-40, 1e-40, 1e-40);
+        assert_eq!(a.try_normalize(), None);
+
+        let a = vector(1e-100, 1e-100, 1e-100);
+        assert_eq!(a.try_normalize(), None);
     }
 
     #[test]
-    fn test_try_normalize_unit_vector_is_some() {
-        let t1 = Vec3::new(1.0, 1.0, 1.0);
-        assert!(t1.try_normalize().is_some());
+    fn try_normalize_unit_vector_is_some() {
+        let a = Vec3::new(1.0, 1.0, 1.0);
+        assert!(a.try_normalize().is_some());
     }
 
     #[test]
-    fn test_normalize_or_with_nonzero_vector() {
-        let t1 = Vec3::new(3.0, 4.0, 0.0);
-        let normalized = t1.normalize_or(Vec3::ZERO);
+    fn normalize_or_with_nonzero_vector() {
+        let a = Vec3::new(3.0, 4.0, 0.0);
+        let normalized = a.normalize_or(Vec3::ZERO);
         // length should now be approximately 1.0
         assert!((normalized.length() - 1.0).abs() < EPSILON);
     }
 
     #[test]
-    fn test_normalize_or_with_zero_vector_returns_fallback() {
-        let t1 = Vec3::ZERO;
+    fn normalize_or_with_zero_vector_returns_fallback() {
+        let a = Vec3::ZERO;
         let fallback = Vec3::new(1.0, 0.0, 0.0);
-        assert_eq!(t1.normalize_or(fallback), fallback);
+        assert_eq!(a.normalize_or(fallback), fallback);
     }
 
     #[test]
-    fn test_normalize_or_with_tiny_vector_returns_fallback() {
-        let t1 = Vec3::new(1e-40, 1e-40, 1e-40);
+    fn normalize_or_with_tiny_vector_returns_fallback() {
+        let a = Vec3::new(1e-40, 1e-40, 1e-40);
         let fallback = Vec3::new(0.0, 1.0, 0.0);
-        assert_eq!(t1.normalize_or(fallback), fallback);
+        assert_eq!(a.normalize_or(fallback), fallback);
     }
 
     #[test]
-    fn test_normalize_or_does_not_panic_on_zero() {
-        let t1 = Vec3::ZERO;
+    fn normalize_or_does_not_panic_on_zero() {
+        let a = Vec3::ZERO;
         let fallback = Vec3::splat(42.0);
-        let result = std::panic::catch_unwind(|| t1.normalize_or(fallback));
+        let result = std::panic::catch_unwind(|| a.normalize_or(fallback));
         assert!(result.is_ok());
     }
 
     #[test]
-    fn test_dot_product_of_two_vectors() {
-        let t1 = Vec3::new(1.0, 2.0, 3.0);
-        let t2 = Vec3::new(2.0, 3.0, 4.0);
-        assert_eq!(t1.dot(t2), 20.0);
+    fn dot_product_of_two_vectors() {
+        let a = vector(1, 2, 3);
+        let b = vector(2, 3, 4);
+        assert_eq!(a.dot(b), 20.0);
     }
 
     #[test]
-    fn test_cross_product_of_two_vectors() {
-        let t1 = Vec3::new(1.0, 2.0, 3.0);
-        let t2 = Vec3::new(2.0, 3.0, 4.0);
-        assert_eq!(t1.cross(t2), Vec3::new(-1.0, 2.0, -1.0));
-        assert_eq!(t2.cross(t1), Vec3::new(1.0, -2.0, 1.0));
+    fn cross_product_of_two_vectors() {
+        let a = vector(1, 2, 3);
+        let b = vector(2, 3, 4);
+        assert_eq!(a.cross(b), vector(-1, 2, -1));
+        assert_eq!(b.cross(a), vector(1, -2, 1));
     }
 
     #[test]
-    fn test_reflecting_at_45_degrees() {
-        let v = vector(1.0, -1.0, 0.0);
-        let normal = vector(0.0, 1.0, 0.0);
-        let r = v.reflect(normal);
-        assert_eq!(r, vector(1.0, 1.0, 0.0));
+    fn reflecting_vector_at_45_degrees() {
+        let v = vector(1, -1, 0);
+        let n = vector(0, 1, 0);
+        let r = v.reflect(n);
+
+        assert_eq!(r, vector(1, 1, 0));
     }
 
     #[test]
-    fn test_reflecting_off_slanted_surface() {
-        let v = vector(0.0, -1.0, 0.0);
-        let sqrt2_div2 = (2.0_f64).sqrt() / 2.0;
+    fn reflect_with_opposite_direction() {
+        let v = vector(1, 0, 0);
+        let n = vector(-1, 0, 0); // Pointing opposite
+        let r = v.reflect(n);
+        assert_eq!(r, vector(-1, 0, 0));
+    }
 
-        let normal = vector(sqrt2_div2, sqrt2_div2, 0.0);
-        let reflected = v.reflect(normal);
-        assert_eq!(reflected, vector(1.0, 0.0, 0.0));
+    #[test]
+    fn reflecting_vector_off_slanted_surface() {
+        let v = vector(0, -1, 0);
+        let sqrt2_over_2 = 2.0_f64.sqrt() / 2.0;
+        let n = vector(sqrt2_over_2, sqrt2_over_2, 0);
+        let r = v.reflect(n);
+
+        assert_eq!(r, vector(1, 0, 0));
     }
 }

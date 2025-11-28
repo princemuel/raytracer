@@ -33,7 +33,10 @@ pub enum MathError {
     /// Matrix is not invertible (determinant is zero)
     MatrixNotInvertible { matrix: String },
     /// Invalid vector operation (e.g., normalizing zero vector)
-    InvalidVector { operation: String, vector: [f64; 3] },
+    InvalidVector {
+        operation: String,
+        vector:    [f64; 3],
+    },
     /// Invalid transformation parameters
     InvalidTransform {
         transform_type: String,
@@ -95,7 +98,11 @@ pub enum GeometryError {
     /// Transform stack overflow (too many nested transformations)
     TransformStackOverflow { depth: usize, max_depth: usize },
     /// Invalid UV coordinates for texture mapping
-    InvalidUvCoordinates { u: f64, v: f64, shape: String },
+    InvalidUvCoordinates {
+        u:     f64,
+        v:     f64,
+        shape: String,
+    },
 }
 
 /// Material and shading errors
@@ -209,24 +216,27 @@ impl fmt::Display for TracerError {
 impl fmt::Display for MathError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::DivisionByZero { operation: op, value } => {
+            Self::DivisionByZero {
+                operation: op,
+                value,
+            } => {
                 write!(f, "Division by zero in {op}: value was {value}")
-            },
+            }
             Self::MatrixNotInvertible { matrix } => {
                 write!(f, "{matrix} matrix is not invertible (determinant is zero)",)
-            },
+            }
             Self::InvalidVector {
                 operation: op,
                 vector: [x, y, z],
             } => {
                 write!(f, "Invalid vector for {op}: ({x}, {y}, {z})",)
-            },
+            }
             Self::InvalidTransform {
                 transform_type,
                 reason,
             } => {
                 write!(f, "Invalid {transform_type} transformation: {reason}")
-            },
+            }
             Self::PrecisionError {
                 operation: op,
                 expected,
@@ -237,7 +247,7 @@ impl fmt::Display for MathError {
                     f,
                     "Precision error in {op}: expected {expected}, got {actual} (ε={epsilon})",
                 )
-            },
+            }
         }
     }
 }
@@ -251,7 +261,7 @@ impl fmt::Display for GraphicsError {
                 max_size: size,
             } => {
                 write!(f, "Invalid canvas dimensions: {w}x{h} (max size: {size})",)
-            },
+            }
             Self::PixelOutOfBounds {
                 x,
                 y,
@@ -259,7 +269,7 @@ impl fmt::Display for GraphicsError {
                 height: h,
             } => {
                 write!(f, "Pixel ({x}, {y}) is out of bounds for {w}x{h} canvas",)
-            },
+            }
             Self::InvalidColorValue {
                 component,
                 value,
@@ -269,13 +279,13 @@ impl fmt::Display for GraphicsError {
                     f,
                     "Invalid color {component}: {value} (valid range: {a:.2} to {b:.2})",
                 )
-            },
+            }
             Self::InvalidCamera { reason } => {
                 write!(f, "Invalid camera configuration: {reason}")
-            },
+            }
             Self::RayCastError { reason } => {
                 write!(f, "Ray casting failed: {reason}")
-            },
+            }
         }
     }
 }
@@ -293,7 +303,7 @@ impl fmt::Display for GeometryError {
                     "No intersection with {shape} (ray: origin=({x:.2}, {y:.2}, {z:.2}), \
                      direction=({a:.2}, {b:.2}, {c:.2}))",
                 )
-            },
+            }
             Self::InvalidShape {
                 shape,
                 parameter,
@@ -301,13 +311,16 @@ impl fmt::Display for GeometryError {
                 reason,
             } => {
                 write!(f, "Invalid {shape} {parameter}: {value} ({reason})")
-            },
+            }
             Self::TransformStackOverflow { depth, max_depth } => {
-                write!(f, "Transform stack overflow: {depth} levels (max: {max_depth})",)
-            },
+                write!(
+                    f,
+                    "Transform stack overflow: {depth} levels (max: {max_depth})",
+                )
+            }
             Self::InvalidUvCoordinates { u, v, shape } => {
                 write!(f, "Invalid UV coordinates ({u}, {v}) for {shape}")
-            },
+            }
         }
     }
 }
@@ -324,10 +337,10 @@ impl fmt::Display for ShadingError {
                     f,
                     "Invalid material {property}: {value} (valid range: {a:.2} to {b:.2})",
                 )
-            },
+            }
             Self::PatternError { pattern, reason } => {
                 write!(f, "Pattern generation failed for {pattern}: {reason}")
-            },
+            }
             Self::LightingError {
                 reason,
                 light_position: [a, b, c],
@@ -338,7 +351,7 @@ impl fmt::Display for ShadingError {
                     "Lighting calculation failed: {reason} (light: ({a:.2}, {b:.2}, {c:.2}),
                     surface: ({x:.2}, {y:.2}, {z:.2}))",
                 )
-            },
+            }
             Self::RecursionLimitExceeded {
                 depth,
                 max_depth,
@@ -348,7 +361,7 @@ impl fmt::Display for ShadingError {
                     f,
                     "Recursion limit exceeded for {ray}: {depth} levels (max: {max_depth})",
                 )
-            },
+            }
         }
     }
 }
@@ -360,16 +373,16 @@ impl fmt::Display for WorldError {
             Self::NoLights => write!(f, "Scene contains no lights"),
             Self::TooManyObjects { count, max_count } => {
                 write!(f, "Too many objects in scene: {count} (max: {max_count})")
-            },
+            }
             Self::ObjectNotFound { id } => {
                 write!(f, "Object not found: {id}",)
-            },
+            }
             Self::LightNotFound { id } => {
                 write!(f, "Light not found: {id}")
-            },
+            }
             Self::InvalidHierarchy { reason } => {
                 write!(f, "Invalid scene hierarchy: {reason}")
-            },
+            }
         }
     }
 }
@@ -383,7 +396,7 @@ impl fmt::Display for IoError {
                 source,
             } => {
                 write!(f, "Failed to {operation} file '{filename}': {source}")
-            },
+            }
             Self::UnsupportedFormat {
                 filename,
                 format,
@@ -394,18 +407,22 @@ impl fmt::Display for IoError {
                     "Unsupported format '{format}' for file '{filename}'. Supported: {}",
                     supported_formats.join(", ")
                 )
-            },
+            }
             Self::ParseError {
                 filename,
                 line_number,
                 reason,
             } => match line_number {
-                Some(line) => write!(f, "Parse error in '{}' at line {}: {}", filename, line, reason),
+                Some(line) => write!(
+                    f,
+                    "Parse error in '{}' at line {}: {}",
+                    filename, line, reason
+                ),
                 None => write!(f, "Parse error in '{}': {}", filename, reason),
             },
             Self::NetworkError { url, reason } => {
                 write!(f, "Network error accessing '{}': {}", url, reason)
-            },
+            }
         }
     }
 }
@@ -415,16 +432,20 @@ impl fmt::Display for ConfigError {
         match self {
             Self::MissingConfig { key, file } => {
                 write!(f, "Missing configuration '{key}' in file '{file}'",)
-            },
-            Self::InvalidConfig { key, value, expected } => {
+            }
+            Self::InvalidConfig {
+                key,
+                value,
+                expected,
+            } => {
                 write!(
                     f,
                     "Invalid configuration '{key}': got '{value}', expected {expected}",
                 )
-            },
+            }
             Self::CorruptedConfig { file, reason } => {
                 write!(f, "Corrupted configuration file '{file}': {reason}")
-            },
+            }
             Self::VersionMismatch {
                 component,
                 required_version,
@@ -434,7 +455,7 @@ impl fmt::Display for ConfigError {
                     f,
                     "Version mismatch for {component}: required {required_version}, found {found_version}",
                 )
-            },
+            }
         }
     }
 }
